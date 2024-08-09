@@ -1,6 +1,6 @@
 {
   "name": "ffc-pay-submission",
-  "version": "1.26.41",
+  "version": "1.26.42",
   "description": "FFC payment submission service",
   "homepage": "https://github.com/DEFRA/ffc-pay-submission",
   "main": "app/index.js",
