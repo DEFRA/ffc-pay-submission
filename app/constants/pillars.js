@@ -31,5 +31,6 @@ module.exports = {
   FC: 'FC',
   IMPS: 'IMPS',
   SFI23: 'SFI23',
-  DP: 'DP'
+  DP: 'DP',
+  ESFIO: 'ESFIO'
 }
