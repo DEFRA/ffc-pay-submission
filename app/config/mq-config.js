@@ -7,7 +7,8 @@ const mqSchema = joi.object({
     password: joi.string(),
     useCredentialChain: joi.bool().default(false),
     type: joi.string().default('subscription'),
-    appInsights: joi.object()
+    appInsights: joi.object(),
+    managedIdentityClientId: Joi.string().optional()
   },
   submitSubscription: {
     address: joi.string(),
@@ -31,7 +32,8 @@ const mqConfig = {
     password: process.env.MESSAGE_QUEUE_PASSWORD,
     useCredentialChain: process.env.NODE_ENV === 'production',
     type: 'subscription',
-    appInsights: process.env.NODE_ENV === 'production' ? require('applicationinsights') : undefined
+    appInsights: process.env.NODE_ENV === 'production' ? require('applicationinsights') : undefined,
+    managedIdentityClientId: process.env.AZURE_CLIENT_ID
   },
   submitSubscription: {
     address: process.env.PAYMENTSUBMIT_SUBSCRIPTION_ADDRESS,

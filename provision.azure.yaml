@@ -1,5 +1,13 @@
 resources:
+  identity: pay-submission
+  postgreSql:
+    name: ffc-pay-submission
   topics:
-    - name: paymentSubmit
-    - name: fileSend
-    - name: event
+    - name: ffc-pay-submit
+      role: receiver
+      subscriptions:
+        - name: ffc-pay-submission
+    - name: ffc-pay-file-send
+      role: sender
+    - name: ffc-pay-events
+      role: sender

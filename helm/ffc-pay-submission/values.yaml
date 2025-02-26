@@ -33,6 +33,8 @@ container:
   paymentSubmitTopicAddress: ffc-pay-submit
   paymentSubmitSubscriptionAddress: ffc-pay-submission
   fileSendTopicAddress: ffc-pay-file-send
+  eventTopicAddress: ffc-pay-event
+  eventsTopicAddress: ffc-pay-events
   azureStorageAccountName: ffcpay
   azureStorageConnectionString: dummy
   azureStorageUseConnectionString: false
@@ -42,8 +44,6 @@ container:
   batchGenerationInterval: 1800000
   batchSize: 2000
   batchCap: 1
-  eventTopicAddress: ffc-pay-event
-  eventsTopicAddress: ffc-pay-events
   useV2Events: true
 
 postgresService:
@@ -53,7 +53,7 @@ postgresService:
   postgresSchema: public
   postgresUser: postgres
 
-aadPodIdentity: true
+workloadIdentity: true
 
 azureIdentity:
   clientID: not-a-real-clientID
