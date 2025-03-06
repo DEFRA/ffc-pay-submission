@@ -45,6 +45,7 @@ container:
   eventTopicAddress: ffc-pay-event
   eventsTopicAddress: ffc-pay-events
   useV2Events: true
+  useV2ReturnFiles: true
 
 postgresService:
   postgresDb: ffc_pay_submission

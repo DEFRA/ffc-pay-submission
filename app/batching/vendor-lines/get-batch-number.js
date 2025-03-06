@@ -1,3 +1,4 @@
+const config = require('../../config')
 const { ES, FC, IMPS } = require('../../constants/schemes')
 
 const getBatchNumber = (schemeId, sequence, batchName) => {
@@ -5,7 +6,7 @@ const getBatchNumber = (schemeId, sequence, batchName) => {
     return ''
   }
 
-  if ([FC, IMPS].includes(schemeId) && batchName) {
+  if ([FC, IMPS].includes(schemeId) && batchName && config.useV2ReturnFiles) {
     let batchNamePattern
     if (schemeId === FC) {
       batchNamePattern = /^FCAP_(\d{4})_\d*\.dat$/
