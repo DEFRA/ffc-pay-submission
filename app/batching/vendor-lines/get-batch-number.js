@@ -5,7 +5,7 @@ const getBatchNumber = (schemeId, sequence, batchName) => {
   if (schemeId === ES) {
     return ''
   }
-
+  
   if ([FC, IMPS].includes(schemeId) && batchName && config.useV2ReturnFiles) {
     let batchNamePattern
     if (schemeId === FC) {
