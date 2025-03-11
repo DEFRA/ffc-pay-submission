@@ -1,0 +1,3 @@
+container.paymentSubmitSubscriptionAddress: queue:ffc-pay-submission
+container.fileSendTopicAddress: queue:ffc-pay-file-send
+container.eventsTopicAddress: queue:ffc-pay-events
