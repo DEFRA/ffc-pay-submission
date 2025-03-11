@@ -10,7 +10,7 @@ const schema = Joi.object({
   batchSize: Joi.number().default(2000),
   batchCap: Joi.number().default(1),
   useV2Events: Joi.boolean().default(true),
-  useV2ReturnFiles: Joi.boolean().default(true)
+  useV2ReturnFiles: Joi.boolean().optional().default(true)
 })
 
 // Build config
