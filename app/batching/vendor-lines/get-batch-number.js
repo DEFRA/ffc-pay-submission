@@ -13,7 +13,6 @@ const getBatchNumber = (schemeId, sequence, batchName) => {
     } else {
       batchNamePattern = /^FIN_IMPS_A[P|R]_(\d*).INT$/
     }
-
     const match = batchName.match(batchNamePattern)
     if (match?.[1]) {
       return match[1]
