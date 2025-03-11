@@ -28,7 +28,7 @@ services:
       AZURE_STORAGE_ACCOUNT_NAME: ${AZURE_STORAGE_ACCOUNT_NAME:-devstoreaccount1}
       AZURE_STORAGE_USE_CONNECTION_STRING: "true"
       BATCH_INTERVAL: 10000
-      USE_V2_RETURN_FILES: ${USE_V2_RETURN_FILES:-"true"}
+      USE_V2_RETURN_FILES: ${USE_V2_RETURN_FILES}
   
   ffc-pay-submission-postgres:
     image: postgres:11.4-alpine
