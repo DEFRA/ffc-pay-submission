@@ -28,7 +28,6 @@ describe('BlobServiceClient initialization', () => {
   beforeEach(() => {
     jest.resetModules()
     jest.clearAllMocks()
-
     config = require('../../app/config/storage-config')
     consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
     ({ BlobServiceClient } = require('@azure/storage-blob'));
