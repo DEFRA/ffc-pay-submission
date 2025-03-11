@@ -20,7 +20,7 @@ const config = {
   batchSize: process.env.BATCH_SIZE,
   batchCap: process.env.BATCH_CAP,
   useV2Events: process.env.USE_V2_EVENTS,
-  useV2ReturnFiles: process.env.USE_V2_RETURN_FILES
+  useV2ReturnFiles: process.env.USE_V2_RETURN_FILES ?? false
 }
 
 // Validate config
