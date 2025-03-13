@@ -46,6 +46,7 @@ container:
   batchCap: 1
   useV2Events: true
   useV2ReturnFiles: true
+  processingActive: true
 
 postgresService:
   postgresDb: ffc_pay_submission

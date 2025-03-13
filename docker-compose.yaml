@@ -29,6 +29,7 @@ services:
       AZURE_STORAGE_USE_CONNECTION_STRING: "true"
       BATCH_INTERVAL: 10000
       USE_V2_RETURN_FILES: ${USE_V2_RETURN_FILES}
+      PROCESSING_ACTIVE: ${PROCESSING_ACTIVE:-true}
   
   ffc-pay-submission-postgres:
     image: postgres:11.4-alpine
