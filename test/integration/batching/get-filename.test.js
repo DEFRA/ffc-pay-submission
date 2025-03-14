@@ -1,8 +1,8 @@
-const db = require('../../../../app/data')
-const getFilename = require('../../../../app/batching/get-filename')
-const { AP, AR } = require('../../../../app/constants/ledgers')
-const { MANUAL } = require('../../../../app/constants/schemes')
-const { SFI } = require('../../../../app/constants/pillars')
+const db = require('../../../app/data')
+const getFilename = require('../../../app/batching/get-filename')
+const { AP, AR } = require('../../../app/constants/ledgers')
+const { MANUAL } = require('../../../app/constants/schemes')
+const { SFI } = require('../../../app/constants/pillars')
 
 let batch
 let pillar

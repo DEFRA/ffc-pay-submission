@@ -1,8 +1,8 @@
-const db = require('../../../../app/data')
-const getBatches = require('../../../../app/batching/get-batches')
-const config = require('../../../../app/config')
+const db = require('../../../app/data')
+const getBatches = require('../../../app/batching/get-batches')
+const config = require('../../../app/config')
 const moment = require('moment')
-const { AP } = require('../../../../app/constants/ledgers')
+const { AP } = require('../../../app/constants/ledgers')
 let scheme
 let batch
 let paymentRequest

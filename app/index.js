@@ -4,6 +4,7 @@ require('./insights').setup()
 const { initialiseContainers } = require('./storage')
 const messaging = require('./messaging')
 const batching = require('./batching')
+const { start: startServer } = require('./server')
 
 const config = require('./config')
 
@@ -13,6 +14,7 @@ process.on(['SIGTERM', 'SIGINT'], async () => {
 })
 
 const startApp = async () => {
+  await startServer()
   if (config.processingActive) {
     await initialiseContainers()
     await messaging.start()

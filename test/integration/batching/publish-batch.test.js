@@ -1,6 +1,6 @@
-const publishBatch = require('../../../../app/batching/publish-batch')
+const publishBatch = require('../../../app/batching/publish-batch')
 const { BlobServiceClient } = require('@azure/storage-blob')
-const config = require('../../../../app/config').storageConfig
+const config = require('../../../app/config').storageConfig
 let blobServiceClient
 let container
 

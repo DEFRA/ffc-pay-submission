@@ -30,11 +30,11 @@ jest.mock('ffc-pay-event-publisher', () => {
   }
 })
 
-const db = require('../../../../app/data')
+const db = require('../../../app/data')
 
-const { AP } = require('../../../../app/constants/ledgers')
+const { AP } = require('../../../app/constants/ledgers')
 
-const generateBatches = require('../../../../app/batching/generate-batches')
+const generateBatches = require('../../../app/batching/generate-batches')
 
 let scheme
 let batch

@@ -1,7 +1,7 @@
-const db = require('../../../../app/data')
-const completeBatch = require('../../../../app/batching/complete-batch')
+const db = require('../../../app/data')
+const completeBatch = require('../../../app/batching/complete-batch')
 const moment = require('moment')
-const { AP } = require('../../../../app/constants/ledgers')
+const { AP } = require('../../../app/constants/ledgers')
 let scheme
 let batch
 

@@ -2,6 +2,7 @@ const Joi = require('joi')
 const mqConfig = require('./mq-config')
 const dbConfig = require('./db-config')
 const storageConfig = require('./storage-config')
+const serverConfig = require('./server')
 
 // Define config schema
 const schema = Joi.object({
@@ -48,5 +49,6 @@ value.eventTopic = mqConfig.eventTopic
 value.eventsTopic = mqConfig.eventsTopic
 value.dbConfig = dbConfig
 value.storageConfig = storageConfig
+value.serverConfig = serverConfig
 
 module.exports = value

@@ -3,7 +3,10 @@ services:
     build:
       context: .
       target: production
-    image: ffc-pay-submission
+    image: ffc-pay-submissio
+    ports:
+      - "3015:3015"
+      - "9243:9229"
     container_name: ffc-pay-submission
     depends_on: 
       - ffc-pay-dax-azurite

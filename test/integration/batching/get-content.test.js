@@ -1,9 +1,9 @@
-const { AP, AR } = require('../../../../app/constants/ledgers')
-const { SFI23, SFI } = require('../../../../app/constants/pillars')
-const { Q1 } = require('../../../../app/constants/schedules')
+const { AP, AR } = require('../../../app/constants/ledgers')
+const { SFI23, SFI } = require('../../../app/constants/pillars')
+const { Q1 } = require('../../../app/constants/schedules')
 
-const getContent = require('../../../../app/batching/get-content')
-const { CS, IMPS, ES, FC } = require('../../../../app/constants/schemes')
+const getContent = require('../../../app/batching/get-content')
+const { CS, IMPS, ES, FC } = require('../../../app/constants/schemes')
 
 const AGREEMENT_NUMBER_INDEX = 28
 const FUND_CODE_INDEX = 3
