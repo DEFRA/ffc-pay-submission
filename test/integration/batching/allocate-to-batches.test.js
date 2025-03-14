@@ -1,7 +1,7 @@
-const allocateToBatch = require('../../../../app/batching/allocate-to-batches')
-const db = require('../../../../app/data')
-const { AP, AR } = require('../../../../app/constants/ledgers')
-const { SFI, SFI23 } = require('../../../../app/constants/pillars')
+const allocateToBatch = require('../../../app/batching/allocate-to-batches')
+const db = require('../../../app/data')
+const { AP, AR } = require('../../../app/constants/ledgers')
+const { SFI, SFI23 } = require('../../../app/constants/pillars')
 
 let scheme
 let paymentRequest

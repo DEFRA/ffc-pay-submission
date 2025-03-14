@@ -8,6 +8,7 @@ services:
     image: ffc-pay-submission-development
     container_name: ffc-pay-submission-development
     ports:
+      - "3015:3015"
       - "9243:9229"
     volumes:
       - ./app:/home/node/app

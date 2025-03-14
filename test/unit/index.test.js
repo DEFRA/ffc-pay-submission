@@ -4,8 +4,13 @@ jest.mock('../../app/insights', () => ({
   setup: jest.fn()
 }))
 const { setup: mockSetup } = require('../../app/insights')
+
+jest.mock('../../app/server')
+const { start: mockStartServer } = require('../../app/server')
+
 jest.mock('../../app/batching')
 const { start: mockBatchingStart } = require('../../app/batching')
+
 jest.mock('../../app/messaging')
 const { start: mockMessagingStart } = require('../../app/messaging')
 
@@ -24,6 +29,18 @@ describe('app start', () => {
       require('../../app')
     })
     expect(mockSetup).toHaveBeenCalled()
+  })
+
+  test('starts server when active is true', async () => {
+    config.processingActive = true
+    await startApp()
+    expect(mockStartServer).toHaveBeenCalled()
+  })
+
+  test('start server if active is false', async () => {
+    config.processingActive = false
+    await startApp()
+    expect(mockStartServer).toHaveBeenCalled()
   })
 
   test('initialises containers when active is true', async () => {

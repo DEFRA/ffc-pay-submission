@@ -1,6 +1,6 @@
 const { v4: uuidv4 } = require('uuid')
-const db = require('../../../../app/data')
-const savePaymentRequest = require('../../../../app/inbound')
+const db = require('../../../app/data')
+const savePaymentRequest = require('../../../app/inbound')
 
 let scheme
 let paymentRequest
