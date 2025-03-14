@@ -3,7 +3,7 @@ services:
     build:
       context: .
       target: production
-    image: ffc-pay-submissio
+    image: ffc-pay-submission
     ports:
       - "3015:3015"
       - "9243:9229"
