@@ -2,9 +2,9 @@
 version: v1.22.0
 # ignores vulnerabilities until expiry date; change duration by modifying expiry date
 ignore:
-  SNYK-JS-SEMVER-3247795:
+  SNYK-JS-FORMDATA-10841150:
     - '*':
-        reason: None Given
-        expires: 2023-07-22T12:35:06.796Z
-        created: 2023-06-22T12:35:06.803Z
+        reason: No current fix available
+        expires: 2025-07-29T12:35:06.796Z
+        created: 2025-07-22T06:35:06.803Z
 patch: {}
