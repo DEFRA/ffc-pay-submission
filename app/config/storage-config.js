@@ -17,7 +17,7 @@ const config = {
   storageAccount: process.env.AZURE_STORAGE_ACCOUNT_NAME,
   container: process.env.AZURE_STORAGE_CONTAINER,
   folder: process.env.AZURE_STORAGE_FOLDER,
-  useConnectionStr: process.env.AZURE_STORAGE_USE_CONNECTION_STRING,
+  useConnectionStr: process.env.AZURE_STORAGE_USE_CONNECTION_STRING === 'true',
   createContainers: process.env.AZURE_STORAGE_CREATE_CONTAINERS,
   managedIdentityClientId: process.env.AZURE_CLIENT_ID
 }
