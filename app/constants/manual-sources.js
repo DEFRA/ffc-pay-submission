@@ -61,7 +61,7 @@ module.exports = {
   [SFIP]: 'PMAN_SFIP',
   [LSES]: 'NMAN_DA',
   [AHWR]: 'NMAN_DA',
-  [CS]: 'NMAN_DA',
+  [CS]: 'PMAN_CS',
   [BPS]: 'NMAN_DA',
   [FDMR]: 'NMAN_DA',
   [ES]: 'NMAN_DA',
