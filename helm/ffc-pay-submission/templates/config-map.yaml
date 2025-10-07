@@ -30,6 +30,5 @@ data:
   BATCH_INTERVAL: {{ quote .Values.container.batchGenerationInterval }}
   BATCH_SIZE: {{ quote .Values.container.batchSize }}
   BATCH_CAP: {{ quote .Values.container.batchCap }}
-  USE_V2_EVENTS: {{ quote .Values.container.useV2Events }}
   USE_V2_RETURN_FILES: {{ quote .Values.container.useV2ReturnFiles }}
 {{- end -}}

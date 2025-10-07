@@ -8,7 +8,7 @@ const sendFileTransferMessage = async (filename, batch) => {
   const message = createMessage(filename, ledger)
   const sender = new MessageSender(sendTopic)
   await sender.sendMessage(message)
-  await sendSubmissionTransferEvent(filename, batch)
+  await sendSubmissionTransferEvent(filename)
   await sender.closeConnection()
 }
 

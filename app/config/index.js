@@ -11,7 +11,6 @@ const schema = Joi.object({
   batchGenerationInterval: Joi.number().default(1800000), // 30 minutes
   batchSize: Joi.number().default(2000),
   batchCap: Joi.number().default(1),
-  useV2Events: Joi.boolean().default(true),
   useV2ReturnFiles: Joi.boolean().optional().default(true)
 })
 
@@ -22,7 +21,6 @@ const config = {
   batchGenerationInterval: process.env.BATCH_INTERVAL,
   batchSize: process.env.BATCH_SIZE,
   batchCap: process.env.BATCH_CAP,
-  useV2Events: process.env.USE_V2_EVENTS,
   useV2ReturnFiles: (process.env.USE_V2_RETURN_FILES === 'true' || process.env.USE_V2_RETURN_FILES === true) ?? false
 }
 

@@ -20,16 +20,12 @@ const { BATCH_CREATED } = require('../../../app/constants/events')
 
 const sendSubmissionTransferEvents = require('../../../app/event/send-submission-transfer-event')
 
-let batch
 let filename
 
 describe('V2 submission transfer events', () => {
   beforeEach(() => {
-    batch = JSON.parse(JSON.stringify(require('../../mocks/batch')))
-
     filename = require('../../mocks/filename')
 
-    config.useV2Events = true
     config.eventsTopic = 'v2-events'
   })
 
@@ -37,40 +33,28 @@ describe('V2 submission transfer events', () => {
     jest.clearAllMocks()
   })
 
-  test('should send V2 event if V2 events enabled', async () => {
-    config.useV2Events = true
-    await sendSubmissionTransferEvents(filename, batch)
-    expect(mockPublishEvent).toHaveBeenCalled()
-  })
-
-  test('should not send V2 event if V2 events disabled', async () => {
-    config.useV2Events = false
-    await sendSubmissionTransferEvents(filename, batch)
-    expect(mockPublishEvent).not.toHaveBeenCalled()
-  })
-
   test('should send event to V2 topic', async () => {
-    await sendSubmissionTransferEvents(filename, batch)
+    await sendSubmissionTransferEvents(filename)
     expect(MockEventPublisher.mock.calls[0][0]).toBe(config.eventsTopic)
   })
 
   test('should raise an event with processing source', async () => {
-    await sendSubmissionTransferEvents(filename, batch)
+    await sendSubmissionTransferEvents(filename)
     expect(mockPublishEvent.mock.calls[0][0].source).toBe(SOURCE)
   })
 
   test('should raise acknowledged payment event type', async () => {
-    await sendSubmissionTransferEvents(filename, batch)
+    await sendSubmissionTransferEvents(filename)
     expect(mockPublishEvent.mock.calls[0][0].type).toBe(BATCH_CREATED)
   })
 
   test('should raise an event with filename as subject', async () => {
-    await sendSubmissionTransferEvents(filename, batch)
+    await sendSubmissionTransferEvents(filename)
     expect(mockPublishEvent.mock.calls[0][0].subject).toBe(filename)
   })
 
   test('should include filename as subject', async () => {
-    await sendSubmissionTransferEvents(filename, batch)
+    await sendSubmissionTransferEvents(filename)
     expect(mockPublishEvent.mock.calls[0][0].subject).toBe(filename)
   })
 })
