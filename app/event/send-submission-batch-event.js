@@ -4,12 +4,6 @@ const { SOURCE } = require('../constants/source')
 const { PAYMENT_SUBMITTED } = require('../constants/events')
 
 const sendSubmissionBatchEvent = async (batch, filename) => {
-  if (config.useV2Events) {
-    await sendV2SubmissionBatchEvent(batch, filename)
-  }
-}
-
-const sendV2SubmissionBatchEvent = async (batch, filename) => {
   const events = batch.paymentRequests.map(paymentRequest => createEvent(paymentRequest, filename))
   const eventPublisher = new EventPublisher(config.eventsTopic)
   await eventPublisher.publishEvents(events)
