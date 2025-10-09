@@ -1,4 +1,4 @@
-const { BPS, CS, FDMR, LumpSums, SFI, SFIP, VetVisits, IMPS, ES, SFI23, Delinked, SFIExpanded } = require('../../../../app/constants/schemes')
+const { BPS, CS, FDMR, LumpSums, SFI, SFIP, VetVisits, IMPS, ES, SFI23, Delinked, SFIExpanded, SITICOHTC, SITICOHTR } = require('../../../../app/constants/schemes')
 
 const { getPaymentType } = require('../../../../app/batching/vendor-lines/get-payment-type')
 
@@ -122,6 +122,18 @@ describe('get payment type tests', () => {
   test('return 0 when schemeId is SFI Expanded and paymentType is "0" ', () => {
     paymentType = '0'
     const result = getPaymentType(SFIExpanded, paymentType)
+    expect(result).toBe(0)
+  })
+
+  test('return 0 when schemeId is SITI_COHTR and paymentType is "0" ', () => {
+    paymentType = '0'
+    const result = getPaymentType(SITICOHTR, paymentType)
+    expect(result).toBe(0)
+  })
+
+  test('return 0 when schemeId is SITI_COHTC and paymentType is "0" ', () => {
+    paymentType = '0'
+    const result = getPaymentType(SITICOHTC, paymentType)
     expect(result).toBe(0)
   })
 })
