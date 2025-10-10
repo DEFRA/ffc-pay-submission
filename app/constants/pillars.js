@@ -32,5 +32,7 @@ module.exports = {
   IMPS: 'IMPS',
   SFI23: 'SFI23',
   DP: 'DP',
-  ESFIO: 'ESFIO'
+  ESFIO: 'ESFIO',
+  SITICOHTC: 'SITICOHTC',
+  SITICOHTR: 'SITICOHTR'
 }

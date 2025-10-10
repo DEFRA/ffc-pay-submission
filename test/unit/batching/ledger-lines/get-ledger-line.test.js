@@ -13,6 +13,8 @@ let fdmrPaymentRequest
 let sfi23PaymentRequest
 let delinkedPaymentRequest
 let sfiExpandedPaymentRequest
+let sitiCohtcPaymentRequest
+let sitiCohtrPaymentRequest
 let lineId
 let source
 
@@ -28,6 +30,8 @@ beforeEach(() => {
   sfi23PaymentRequest = JSON.parse(JSON.stringify(require('../../../mocks/payment-requests/sfi23')))
   delinkedPaymentRequest = JSON.parse(JSON.stringify(require('../../../mocks/payment-requests/delinked')))
   sfiExpandedPaymentRequest = JSON.parse(JSON.stringify(require('../../../mocks/payment-requests/sfi-expanded')))
+  sitiCohtcPaymentRequest = JSON.parse(JSON.stringify(require('../../../mocks/payment-requests/siti-cohtc')))
+  sitiCohtrPaymentRequest = JSON.parse(JSON.stringify(require('../../../mocks/payment-requests/siti-cohtr')))
   lineId = ''
   source = ''
 })
@@ -98,6 +102,15 @@ describe('get ledger line for AP', () => {
 
   test('should not return substring of invoiceLine.description when schemeId is SFI Expanded', () => {
     const result = getLedgerLineAP(invoiceLine, sfiExpandedPaymentRequest, lineId, source)
+    expect(result[17]).toBe('G00 - Gross value of claim')
+  })
+
+  test('should not return substring of invoiceLine.description when schemeId is SITI_COHTR', () => {
+    const result = getLedgerLineAP(invoiceLine, sitiCohtrPaymentRequest, lineId, source)
+    expect(result[17]).toBe('G00 - Gross value of claim')
+  })
+  test('should not return substring of invoiceLine.description when schemeId is SITI_COHTC', () => {
+    const result = getLedgerLineAP(invoiceLine, sitiCohtcPaymentRequest, lineId, source)
     expect(result[17]).toBe('G00 - Gross value of claim')
   })
 
