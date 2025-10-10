@@ -5,7 +5,7 @@
   </changeSet>
   <changeSet author="Leigh Godson" id="2">
     <comment>Increase char varying to 12 to account for COHTR prefixes</comment>
-    <modifyDataType tableName="batchProperties" columnName="prefix" newDataType="character varying(12)"/>
+    <modifyDataType tableName="batchProperties" columnName="prefix" newDataType="VARCHAR(12)"/>
   </changeSet>
   <changeSet author="Leigh Godson" id="3">
       <comment>Add COHTR scheme</comment>
