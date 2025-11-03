@@ -1,0 +1,54 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-3.9.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.9.xsd">
+  <changeSet author="Leigh Godson" id="1">
+    <tagDatabase tag="v1.33.0" />
+  </changeSet>
+  <changeSet author="Leigh Godson" id="2">
+    <comment>Increase char varying to 12 to account for COHTR prefixes</comment>
+    <modifyDataType tableName="batchProperties" columnName="prefix" newDataType="VARCHAR(12)"/>
+  </changeSet>
+  <changeSet author="Leigh Godson" id="3">
+      <comment>Add COHTR scheme</comment>
+     <insert tableName="schemes">
+      <column name="schemeId" value="15" />
+      <column name="name" value="SITICOHTR" />
+    </insert>
+  </changeSet>
+  <changeSet author="Leigh Godson" id="4">
+     <insert tableName="sequences">
+      <column name="schemeId" value="15" />
+      <column name="nextAP" value="1" />
+      <column name="nextAR" value="1" />
+    </insert>
+  </changeSet>
+  <changeSet author="Leigh Godson" id="5">
+      <insert tableName="batchProperties">
+      <column name="schemeId" value="15" />
+      <column name="prefix" value="FFCSITICOHTR" />
+      <column name="suffix" value=" (SITICOHTR)" />
+      <column name="source" value="SITICOHTR" />
+    </insert>
+  </changeSet>
+    <changeSet author="Leigh Godson" id="6">
+    <comment>Add COHTC scheme</comment>
+     <insert tableName="schemes">
+      <column name="schemeId" value="16" />
+      <column name="name" value="SITICOHTC" />
+    </insert>
+  </changeSet>
+  <changeSet author="Leigh Godson" id="7">
+     <insert tableName="sequences">
+      <column name="schemeId" value="16" />
+      <column name="nextAP" value="1" />
+      <column name="nextAR" value="1" />
+    </insert>
+  </changeSet>
+  <changeSet author="Leigh Godson" id="8">
+      <insert tableName="batchProperties">
+      <column name="schemeId" value="16" />
+      <column name="prefix" value="FFCSITICOHTC" />
+      <column name="suffix" value=" (SITICOHTC)" />
+      <column name="source" value="SITICOHTC" />
+    </insert>
+  </changeSet>
+</databaseChangeLog>
