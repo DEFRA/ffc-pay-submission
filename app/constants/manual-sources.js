@@ -33,8 +33,8 @@ const {
   SFI23,
   DP,
   ESFIO,
-  SITICOHTC,
-  SITICOHTR
+  COHTC,
+  COHTR
 } = require('./pillars')
 
 module.exports = {
@@ -72,6 +72,6 @@ module.exports = {
   [SFI23]: 'PMAN_SFIA',
   [DP]: 'PMAN_DP',
   [ESFIO]: 'PMAN_ESFIO',
-  [SITICOHTC]: 'PMAN_SITICOHTC',
-  [SITICOHTR]: 'PMAN_SITICOHTR'
+  [COHTC]: 'PMAN_COHTC',
+  [COHTR]: 'PMAN_COHTR'
 }

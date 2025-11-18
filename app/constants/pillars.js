@@ -33,6 +33,6 @@ module.exports = {
   SFI23: 'SFI23',
   DP: 'DP',
   ESFIO: 'ESFIO',
-  SITICOHTC: 'SITICOHTC',
-  SITICOHTR: 'SITICOHTR'
+  COHTC: 'COHTC',
+  COHTR: 'COHTR'
 }
