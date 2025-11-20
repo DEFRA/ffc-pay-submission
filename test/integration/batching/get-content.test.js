@@ -16,7 +16,7 @@ let batch
 
 describe('get content', () => {
   beforeEach(() => {
-    batch = require('../../mocks/batch_with_invoice_lines')
+    batch = structuredClone(require('../../mocks/batch_with_invoice_lines'))
   })
 
   test('should return an array', () => {
