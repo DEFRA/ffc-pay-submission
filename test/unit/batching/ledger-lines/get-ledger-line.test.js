@@ -1,169 +1,125 @@
 const { NOT_APPLICABLE } = require('../../../../app/constants/not-applicable')
-
 const { getLedgerLineAP, getLedgerLineAR } = require('../../../../app/batching/ledger-lines/get-ledger-line')
 
 let invoiceLine
-let sfiPaymentRequest
-let sfiPilotPaymentRequest
-let lumpSumsPaymentRequest
-let vetVisitsPaymentRequest
-let csPaymentRequest
-let bpsPaymentRequest
-let fdmrPaymentRequest
-let sfi23PaymentRequest
-let delinkedPaymentRequest
-let sfiExpandedPaymentRequest
-let sitiCohtcPaymentRequest
-let sitiCohtrPaymentRequest
 let lineId
 let source
 
+// Map scheme keys to payment request mocks
+let paymentRequests
+
+const schemesWithSubstring = [
+  { key: 'bps', description: 'Gross value of claim' },
+  { key: 'fdmr', description: 'Gross value of claim' }
+]
+
+const schemesFullDescription = [
+  { key: 'sfi', description: 'G00 - Gross value of claim' },
+  { key: 'sfiPilot', description: 'G00 - Gross value of claim' },
+  { key: 'lumpSums', description: 'G00 - Gross value of claim' },
+  { key: 'vetVisits', description: 'G00 - Gross value of claim' },
+  { key: 'cs', description: 'G00 - Gross value of claim' },
+  { key: 'sfi23', description: 'G00 - Gross value of claim' },
+  { key: 'delinked', description: 'G00 - Gross value of claim' },
+  { key: 'sfiExpanded', description: 'G00 - Gross value of claim' },
+  { key: 'sitiCohtr', description: 'G00 - Gross value of claim' },
+  { key: 'sitiCohtc', description: 'G00 - Gross value of claim' }
+]
+
 beforeEach(() => {
-  invoiceLine = JSON.parse(JSON.stringify(require('../../../mocks/payment-requests/invoice-line')))
-  sfiPaymentRequest = JSON.parse(JSON.stringify(require('../../../mocks/payment-requests/sfi')))
-  sfiPilotPaymentRequest = JSON.parse(JSON.stringify(require('../../../mocks/payment-requests/sfi-pilot')))
-  lumpSumsPaymentRequest = JSON.parse(JSON.stringify(require('../../../mocks/payment-requests/lump-sums')))
-  vetVisitsPaymentRequest = JSON.parse(JSON.stringify(require('../../../mocks/payment-requests/vet-visits')))
-  csPaymentRequest = JSON.parse(JSON.stringify(require('../../../mocks/payment-requests/cs')))
-  bpsPaymentRequest = JSON.parse(JSON.stringify(require('../../../mocks/payment-requests/bps')))
-  fdmrPaymentRequest = JSON.parse(JSON.stringify(require('../../../mocks/payment-requests/fdmr')))
-  sfi23PaymentRequest = JSON.parse(JSON.stringify(require('../../../mocks/payment-requests/sfi23')))
-  delinkedPaymentRequest = JSON.parse(JSON.stringify(require('../../../mocks/payment-requests/delinked')))
-  sfiExpandedPaymentRequest = JSON.parse(JSON.stringify(require('../../../mocks/payment-requests/sfi-expanded')))
-  sitiCohtcPaymentRequest = JSON.parse(JSON.stringify(require('../../../mocks/payment-requests/siti-cohtc')))
-  sitiCohtrPaymentRequest = JSON.parse(JSON.stringify(require('../../../mocks/payment-requests/siti-cohtr')))
+  invoiceLine = structuredClone(require('../../../mocks/payment-requests/invoice-line'))
+
+  paymentRequests = {
+    sfi: structuredClone(require('../../../mocks/payment-requests/sfi')),
+    sfiPilot: structuredClone(require('../../../mocks/payment-requests/sfi-pilot')),
+    lumpSums: structuredClone(require('../../../mocks/payment-requests/lump-sums')),
+    vetVisits: structuredClone(require('../../../mocks/payment-requests/vet-visits')),
+    cs: structuredClone(require('../../../mocks/payment-requests/cs')),
+    bps: structuredClone(require('../../../mocks/payment-requests/bps')),
+    fdmr: structuredClone(require('../../../mocks/payment-requests/fdmr')),
+    sfi23: structuredClone(require('../../../mocks/payment-requests/sfi23')),
+    delinked: structuredClone(require('../../../mocks/payment-requests/delinked')),
+    sfiExpanded: structuredClone(require('../../../mocks/payment-requests/sfi-expanded')),
+    sitiCohtc: structuredClone(require('../../../mocks/payment-requests/siti-cohtc')),
+    sitiCohtr: structuredClone(require('../../../mocks/payment-requests/siti-cohtr'))
+  }
+
   lineId = ''
   source = ''
 })
 
 describe('get ledger line for AP', () => {
-  test('should return marketing year from invoice line when present', () => {
-    const result = getLedgerLineAP(invoiceLine, sfiPaymentRequest, lineId, source)
-    expect(result[5]).toBe(invoiceLine.marketingYear)
+  test.each([
+    { desc: 'invoiceLine marketingYear exists', removeFrom: null, expected: () => invoiceLine.marketingYear },
+    { desc: 'paymentRequest marketingYear fallback', removeFrom: 'invoice', expected: () => paymentRequests.sfi.marketingYear },
+    { desc: 'marketingYear not present returns NOT_APPLICABLE', removeFrom: 'both', expected: () => NOT_APPLICABLE }
+  ])('should return correct marketing year when $desc', ({ removeFrom, expected }) => {
+    if (removeFrom === 'invoice') delete invoiceLine.marketingYear
+    if (removeFrom === 'both') {
+      delete invoiceLine.marketingYear
+      delete paymentRequests.sfi.marketingYear
+    }
+    const result = getLedgerLineAP(invoiceLine, paymentRequests.sfi, lineId, source)
+    expect(result[5]).toBe(expected())
   })
 
-  test('should return marketing year from payment request when not present on invoice line', () => {
-    delete invoiceLine.marketingYear
-    const result = getLedgerLineAP(invoiceLine, sfiPaymentRequest, lineId, source)
-    expect(result[5]).toBe(sfiPaymentRequest.marketingYear)
+  test.each(schemesWithSubstring)('should return substring of description for %s', ({ key, description }) => {
+    const result = getLedgerLineAP(invoiceLine, paymentRequests[key], lineId, source)
+    expect(result[17]).toBe(description)
   })
 
-  test('should return marketing year from payment request when not present on invoice line or payment request', () => {
-    delete invoiceLine.marketingYear
-    delete sfiPaymentRequest.marketingYear
-    const result = getLedgerLineAP(invoiceLine, sfiPaymentRequest, lineId, source)
-    expect(result[5]).toBe(NOT_APPLICABLE)
+  test.each(schemesFullDescription)('should not return substring of description for %s', ({ key, description }) => {
+    const result = getLedgerLineAP(invoiceLine, paymentRequests[key], lineId, source)
+    expect(result[17]).toBe(description)
   })
 
-  test('should return substring of invoiceLine.description when schemeId is BPS', () => {
-    const result = getLedgerLineAP(invoiceLine, bpsPaymentRequest, lineId, source)
-    expect(result[17]).toBe('Gross value of claim')
+  test.each([
+    { key: 'invoiceLine', index: 27 },
+    { key: 'paymentRequest', index: 27 }
+  ])('should return agreement number from $key when present', ({ key, index }) => {
+    if (key === 'paymentRequest') delete invoiceLine.agreementNumber
+    const result = getLedgerLineAP(invoiceLine, paymentRequests.cs, lineId, source)
+    expect(result[index]).toBe(paymentRequests.cs.agreementNumber)
   })
 
-  test('should return substring of invoiceLine.description when schemeId is FDMR', () => {
-    const result = getLedgerLineAP(invoiceLine, fdmrPaymentRequest, lineId, source)
-    expect(result[17]).toBe('Gross value of claim')
-  })
-
-  test('should not return substring of invoiceLine.description when schemeId is SFI', () => {
-    const result = getLedgerLineAP(invoiceLine, sfiPaymentRequest, lineId, source)
-    expect(result[17]).toBe('G00 - Gross value of claim')
-  })
-
-  test('should not return substring of invoiceLine.description when schemeId is SFIP', () => {
-    const result = getLedgerLineAP(invoiceLine, sfiPilotPaymentRequest, lineId, source)
-    expect(result[17]).toBe('G00 - Gross value of claim')
-  })
-
-  test('should not return substring of invoiceLine.description when schemeId is LumpSums', () => {
-    const result = getLedgerLineAP(invoiceLine, lumpSumsPaymentRequest, lineId, source)
-    expect(result[17]).toBe('G00 - Gross value of claim')
-  })
-
-  test('should not return substring of invoiceLine.description when schemeId is VetVisits', () => {
-    const result = getLedgerLineAP(invoiceLine, vetVisitsPaymentRequest, lineId, source)
-    expect(result[17]).toBe('G00 - Gross value of claim')
-  })
-
-  test('should not return substring of invoiceLine.description when schemeId is CS', () => {
-    const result = getLedgerLineAP(invoiceLine, csPaymentRequest, lineId, source)
-    expect(result[17]).toBe('G00 - Gross value of claim')
-  })
-
-  test('should not return substring of invoiceLine.description when schemeId is SFI23', () => {
-    const result = getLedgerLineAP(invoiceLine, sfi23PaymentRequest, lineId, source)
-    expect(result[17]).toBe('G00 - Gross value of claim')
-  })
-
-  test('should not return substring of invoiceLine.description when schemeId is Delinked', () => {
-    const result = getLedgerLineAP(invoiceLine, delinkedPaymentRequest, lineId, source)
-    expect(result[17]).toBe('G00 - Gross value of claim')
-  })
-
-  test('should not return substring of invoiceLine.description when schemeId is SFI Expanded', () => {
-    const result = getLedgerLineAP(invoiceLine, sfiExpandedPaymentRequest, lineId, source)
-    expect(result[17]).toBe('G00 - Gross value of claim')
-  })
-
-  test('should not return substring of invoiceLine.description when schemeId is SITI_COHTR', () => {
-    const result = getLedgerLineAP(invoiceLine, sitiCohtrPaymentRequest, lineId, source)
-    expect(result[17]).toBe('G00 - Gross value of claim')
-  })
-  test('should not return substring of invoiceLine.description when schemeId is SITI_COHTC', () => {
-    const result = getLedgerLineAP(invoiceLine, sitiCohtcPaymentRequest, lineId, source)
-    expect(result[17]).toBe('G00 - Gross value of claim')
-  })
-
-  test('should return invoice line agreement number if exists when AP', () => {
-    const result = getLedgerLineAP(invoiceLine, csPaymentRequest, lineId, source)
-    expect(result[27]).toBe(invoiceLine.agreementNumber)
-  })
-
-  test('should return payment request agreement number if invoice line agreement number does not exist and when AP', () => {
-    delete invoiceLine.agreementNumber
-    const result = getLedgerLineAP(invoiceLine, csPaymentRequest, lineId, source)
-    expect(result[27]).toBe(csPaymentRequest.agreementNumber)
-  })
-
-  test('should return invoice line agreement number if exists when AR', () => {
-    const result = getLedgerLineAR(invoiceLine, csPaymentRequest, lineId, source)
-    expect(result[13]).toBe(invoiceLine.agreementNumber)
-  })
-
-  test('should return payment request agreement number if invoice line agreement number does not exist and when AR', () => {
-    delete invoiceLine.agreementNumber
-    const result = getLedgerLineAR(invoiceLine, csPaymentRequest, lineId, source)
-    expect(result[13]).toBe(csPaymentRequest.agreementNumber)
+  test.each([
+    { key: 'invoiceLine', index: 13 },
+    { key: 'paymentRequest', index: 13 }
+  ])('should return agreement number from $key when AR', ({ key, index }) => {
+    if (key === 'paymentRequest') delete invoiceLine.agreementNumber
+    const result = getLedgerLineAR(invoiceLine, paymentRequests.cs, lineId, source)
+    expect(result[index]).toBe(paymentRequests.cs.agreementNumber)
   })
 })
 
 describe('get ledger line for AR', () => {
   test('should return marketing year from invoice line when present', () => {
-    const result = getLedgerLineAR(invoiceLine, sfiPaymentRequest, lineId, source)
+    const result = getLedgerLineAR(invoiceLine, paymentRequests.sfi, lineId, source)
     expect(result[11]).toBe(invoiceLine.marketingYear)
   })
 
   test('should return marketing year from payment request when not present on invoice line', () => {
     delete invoiceLine.marketingYear
-    const result = getLedgerLineAR(invoiceLine, sfiPaymentRequest, lineId, source)
-    expect(result[11]).toBe(sfiPaymentRequest.marketingYear)
+    const result = getLedgerLineAR(invoiceLine, paymentRequests.sfi, lineId, source)
+    expect(result[11]).toBe(paymentRequests.sfi.marketingYear)
   })
 
   test('should return not applicable marketing year when marketing year not present on invoice line or payment request', () => {
-    delete sfiPaymentRequest.marketingYear
     delete invoiceLine.marketingYear
-    const result = getLedgerLineAR(invoiceLine, sfiPaymentRequest, lineId, source)
+    delete paymentRequests.sfi.marketingYear
+    const result = getLedgerLineAR(invoiceLine, paymentRequests.sfi, lineId, source)
     expect(result[11]).toBe(NOT_APPLICABLE)
   })
 
   test('should return original settlement date when present', () => {
-    sfiPaymentRequest.originalSettlementDate = '01/01/2023'
-    const result = getLedgerLineAR(invoiceLine, sfiPaymentRequest, lineId, source)
-    expect(result[5]).toBe(sfiPaymentRequest.originalSettlementDate)
+    paymentRequests.sfi.originalSettlementDate = '01/01/2023'
+    const result = getLedgerLineAR(invoiceLine, paymentRequests.sfi, lineId, source)
+    expect(result[5]).toBe(paymentRequests.sfi.originalSettlementDate)
   })
 
   test('should return due date when original settlement date not present', () => {
-    const result = getLedgerLineAR(invoiceLine, sfiPaymentRequest, lineId, source)
-    expect(result[5]).toBe(sfiPaymentRequest.dueDate)
+    delete paymentRequests.sfi.originalSettlementDate
+    const result = getLedgerLineAR(invoiceLine, paymentRequests.sfi, lineId, source)
+    expect(result[5]).toBe(paymentRequests.sfi.dueDate)
   })
 })

@@ -29,6 +29,7 @@ describe('get filename', () => {
     await db.sequelize.close()
   })
 
+  // Sequence tests
   test('should return filename for sequence 1', async () => {
     const filename = getFilename(batch, pillar)
     expect(filename).toMatch(/PFELM_0001_AP_\d{14} \(SITI\).csv/)
@@ -40,39 +41,25 @@ describe('get filename', () => {
     expect(filename).toMatch(/PFELM_0010_AP_\d{14} \(SITI\).csv/)
   })
 
+  // Ledger tests
   test('should return filename for AR', async () => {
     batch.ledger = AR
     const filename = getFilename(batch, pillar)
     expect(filename).toMatch(/PFELM_0001_AR_\d{14} \(SITI\).csv/)
   })
 
-  test('should return default manual filename if pillar is undefined', async () => {
-    batch.scheme.schemeId = MANUAL
-    const filename = getFilename(batch, pillar)
-    expect(filename).toMatch(/PFELM_0001_AP_\d{14} \(SITI\).csv/)
+  // Manual pillar fallback tests
+  const fallbackVariants = [undefined, null, '', 'Something']
+  fallbackVariants.forEach(value => {
+    test(`should return default manual filename if pillar is ${value}`, async () => {
+      pillar = value
+      batch.scheme.schemeId = MANUAL
+      const filename = getFilename(batch, pillar)
+      expect(filename).toMatch(/PFELM_0001_AP_\d{14} \(SITI\).csv/)
+    })
   })
 
-  test('should return default manual filename if pillar is null', async () => {
-    pillar = null
-    batch.scheme.schemeId = MANUAL
-    const filename = getFilename(batch, pillar)
-    expect(filename).toMatch(/PFELM_0001_AP_\d{14} \(SITI\).csv/)
-  })
-
-  test('should return default manual filename if pillar is empty string', async () => {
-    pillar = ''
-    batch.scheme.schemeId = MANUAL
-    const filename = getFilename(batch, pillar)
-    expect(filename).toMatch(/PFELM_0001_AP_\d{14} \(SITI\).csv/)
-  })
-
-  test('should return default manual filename if pillar does not have own source', async () => {
-    pillar = 'Something'
-    batch.scheme.schemeId = MANUAL
-    const filename = getFilename(batch, pillar)
-    expect(filename).toMatch(/PFELM_0001_AP_\d{14} \(SITI\).csv/)
-  })
-
+  // Manual pillar override
   test('should override manual filename if pillar has own source', async () => {
     pillar = SFI
     batch.scheme.schemeId = MANUAL

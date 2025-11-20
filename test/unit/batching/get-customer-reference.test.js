@@ -6,7 +6,7 @@ let paymentRequest
 
 describe('get customer reference', () => {
   beforeEach(() => {
-    paymentRequest = JSON.parse(JSON.stringify(require('../../mocks/payment-requests/payment-request')))
+    paymentRequest = structuredClone(require('../../mocks/payment-requests/payment-request'))
   })
 
   test('returns vendor for ES', () => {

@@ -1,39 +1,27 @@
 const mockSendMessage = jest.fn()
-jest.mock('ffc-messaging', () => {
-  return {
-    MessageSender: jest.fn().mockImplementation(() => {
-      return {
-        sendMessage: mockSendMessage,
-        closeConnection: jest.fn()
-      }
-    })
-  }
-})
-jest.mock('ffc-pay-event-publisher', () => {
-  return {
-    PublishEvent: jest.fn().mockImplementation(() => {
-      return {
-        sendEvent: jest.fn()
-      }
-    }),
-    PublishEventBatch: jest.fn().mockImplementation(() => {
-      return {
-        sendEvents: jest.fn()
-      }
-    }),
-    EventPublisher: jest.fn().mockImplementation(() => {
-      return {
-        publishEvents: jest.fn(),
-        publishEvent: jest.fn()
-      }
-    })
-  }
-})
+
+jest.mock('ffc-messaging', () => ({
+  MessageSender: jest.fn().mockImplementation(() => ({
+    sendMessage: mockSendMessage,
+    closeConnection: jest.fn()
+  }))
+}))
+
+jest.mock('ffc-pay-event-publisher', () => ({
+  PublishEvent: jest.fn().mockImplementation(() => ({
+    sendEvent: jest.fn()
+  })),
+  PublishEventBatch: jest.fn().mockImplementation(() => ({
+    sendEvents: jest.fn()
+  })),
+  EventPublisher: jest.fn().mockImplementation(() => ({
+    publishEvents: jest.fn(),
+    publishEvent: jest.fn()
+  }))
+}))
 
 const db = require('../../../app/data')
-
 const { AP } = require('../../../app/constants/ledgers')
-
 const generateBatches = require('../../../app/batching/generate-batches')
 
 let scheme
@@ -44,12 +32,10 @@ let batchProperties
 
 describe('generate batches', () => {
   beforeEach(async () => {
+    jest.clearAllMocks()
     await db.sequelize.truncate({ cascade: true })
 
-    scheme = {
-      schemeId: 1,
-      name: 'SFI'
-    }
+    scheme = { schemeId: 1, name: 'SFI' }
 
     batchProperties = {
       schemeId: 1,
@@ -87,25 +73,28 @@ describe('generate batches', () => {
     await db.sequelize.close()
   })
 
-  test('should generate batch and update as published', async () => {
+  const setup = async () => {
     await db.scheme.create(scheme)
     await db.batchProperties.create(batchProperties)
     await db.batch.create(batch)
     await db.paymentRequest.create(paymentRequest)
     await db.invoiceLine.create(invoiceLine)
     await generateBatches()
-    const batchResult = await db.batch.findByPk(batch.batchId)
-    expect(batchResult.published).not.toBeNull()
+  }
+
+  test('publishes batch', async () => {
+    await setup()
+
+    const result = await db.batch.findByPk(batch.batchId)
+    expect(result.published).not.toBeNull()
   })
 
-  test('should send message for file transfer', async () => {
-    await db.scheme.create(scheme)
-    await db.batchProperties.create(batchProperties)
-    await db.batch.create(batch)
-    await db.paymentRequest.create(paymentRequest)
-    await db.invoiceLine.create(invoiceLine)
-    await generateBatches()
-    expect(mockSendMessage.mock.calls[0][0].body.ledger).toBe(AP)
-    expect(mockSendMessage.mock.calls[0][0].body.filename).toBeDefined()
+  test('sends file-transfer message', async () => {
+    await setup()
+
+    const sent = mockSendMessage.mock.calls[0][0].body
+
+    expect(sent.ledger).toBe(AP)
+    expect(sent.filename).toBeDefined()
   })
 })

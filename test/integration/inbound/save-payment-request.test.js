@@ -5,15 +5,26 @@ const savePaymentRequest = require('../../../app/inbound')
 let scheme
 let paymentRequest
 
+const createPaymentRequestRow = async (where) => {
+  const rows = await db.paymentRequest.findAll({ where })
+  return rows[0]
+}
+
+const createInvoiceLinesRows = async () => {
+  return db.invoiceLine.findAll({
+    include: [{
+      model: db.paymentRequest,
+      as: 'paymentRequest',
+      required: true
+    }]
+  })
+}
+
 describe('save payment requests', () => {
   beforeEach(async () => {
     await db.sequelize.truncate({ cascade: true })
 
-    scheme = {
-      schemeId: 1,
-      name: 'SFI'
-    }
-
+    scheme = { schemeId: 1, name: 'SFI' }
     paymentRequest = {
       sourceSystem: 'SFIP',
       deliveryBody: 'RP00',
@@ -58,130 +69,66 @@ describe('save payment requests', () => {
 
   test('should return payment request header data', async () => {
     await savePaymentRequest(paymentRequest)
-    const paymentRequestRow = await db.paymentRequest.findAll({
-      where: {
-        agreementNumber: 'SIP00000000000001'
-      }
-    })
-    expect(paymentRequestRow[0].invoiceNumber).toBe('S00000001SFIP000001V001')
-    expect(paymentRequestRow[0].contractNumber).toBe('SFIP000001')
-    expect(parseInt(paymentRequestRow[0].frn)).toBe(1234567890)
-    expect(parseInt(paymentRequestRow[0].sbi)).toBe(123456789)
-    expect(paymentRequestRow[0].currency).toBe('GBP')
-    expect(paymentRequestRow[0].dueDate).toBe('2021-08-15')
-    expect(parseFloat(paymentRequestRow[0].value)).toBe(15000)
+    const row = await createPaymentRequestRow({ agreementNumber: paymentRequest.agreementNumber })
+
+    expect(row.invoiceNumber).toBe(paymentRequest.invoiceNumber)
+    expect(row.contractNumber).toBe(paymentRequest.contractNumber)
+    expect(parseInt(row.frn)).toBe(paymentRequest.frn)
+    expect(parseInt(row.sbi)).toBe(paymentRequest.sbi)
+    expect(row.currency).toBe(paymentRequest.currency)
+    expect(row.dueDate).toBe(paymentRequest.dueDate)
+    expect(parseFloat(row.value)).toBe(paymentRequest.value)
   })
 
   test('should return invoice lines data', async () => {
     await savePaymentRequest(paymentRequest)
+    const rows = await createInvoiceLinesRows()
 
-    const invoiceLinesRows = await db.invoiceLine.findAll({
-      include: [{
-        model: db.paymentRequest,
-        as: 'paymentRequest',
-        required: true
-      }]
+    const expectations = [
+      { description: 'G00 - Gross value of claim', value: 25000 },
+      { description: 'P02 - Over declaration penalty', value: -10000 }
+    ]
+
+    rows.forEach((row, index) => {
+      expect(row.schemeCode).toBe('80001')
+      expect(row.accountCode).toBe('SOS273')
+      expect(row.fundCode).toBe('DRD10')
+      expect(row.agreementNumber).toBe(paymentRequest.agreementNumber)
+      expect(row.description).toBe(expectations[index].description)
+      expect(parseFloat(row.value)).toBe(expectations[index].value)
     })
-
-    expect(invoiceLinesRows[0].schemeCode).toBe('80001')
-    expect(invoiceLinesRows[0].accountCode).toBe('SOS273')
-    expect(invoiceLinesRows[0].fundCode).toBe('DRD10')
-    expect(invoiceLinesRows[0].agreementNumber).toBe('SIP00000000000001')
-    expect(invoiceLinesRows[0].description).toBe('G00 - Gross value of claim')
-    expect(parseFloat(invoiceLinesRows[0].value)).toBe(25000)
-
-    expect(invoiceLinesRows[1].schemeCode).toBe('80001')
-    expect(invoiceLinesRows[1].accountCode).toBe('SOS273')
-    expect(invoiceLinesRows[1].fundCode).toBe('DRD10')
-    expect(invoiceLinesRows[1].agreementNumber).toBe('SIP00000000000001')
-    expect(invoiceLinesRows[1].description).toBe('P02 - Over declaration penalty')
-    expect(parseFloat(invoiceLinesRows[1].value)).toBe(-10000)
   })
 
   test('should save referenceId if provided', async () => {
     paymentRequest.referenceId = uuidv4()
     await savePaymentRequest(paymentRequest)
-
-    const paymentRequestRow = await db.paymentRequest.findAll({
-      where: {
-        referenceId: paymentRequest.referenceId
-      }
-    })
-
-    expect(paymentRequestRow.length).toBe(1)
+    const rows = await db.paymentRequest.findAll({ where: { referenceId: paymentRequest.referenceId } })
+    expect(rows).toHaveLength(1)
   })
 
   test('should not save referenceId if not provided', async () => {
     await savePaymentRequest(paymentRequest)
-
-    const paymentRequestRow = await db.paymentRequest.findAll({
-      where: {
-        invoiceNumber: 'S00000001SFIP000001V001'
-      }
-    })
-
-    expect(paymentRequestRow.length).toBe(1)
-    expect(paymentRequestRow[0].requestId).toBeUndefined()
+    const row = await createPaymentRequestRow({ invoiceNumber: paymentRequest.invoiceNumber })
+    expect(row.requestId).toBeUndefined()
   })
 
-  test('should only insert the first payment request based on invoice number', async () => {
+  test.each([
+    { desc: 'duplicate invoice number', modify: () => {}, expected: 1 },
+    { desc: 'second payment request with referenceId', modify: () => { paymentRequest.referenceId = uuidv4() }, expected: 2 }
+  ])('should handle $desc correctly', async ({ modify, expected }) => {
     await savePaymentRequest(paymentRequest)
+    modify()
     await savePaymentRequest(paymentRequest)
 
-    const paymentRequestRow = await db.paymentRequest.findAll({
-      where: {
-        invoiceNumber: 'S00000001SFIP000001V001'
-      }
-    })
-
-    expect(paymentRequestRow.length).toBe(1)
+    const rows = await db.paymentRequest.findAll({ where: { invoiceNumber: paymentRequest.invoiceNumber } })
+    expect(rows).toHaveLength(expected)
   })
 
-  test('should only insert the first payment request based on reference Id', async () => {
-    paymentRequest.referenceId = uuidv4()
-    await savePaymentRequest(paymentRequest)
-    await savePaymentRequest(paymentRequest)
-
-    const paymentRequestRow = await db.paymentRequest.findAll({
-      where: {
-        invoiceNumber: 'S00000001SFIP000001V001'
-      }
-    })
-
-    expect(paymentRequestRow.length).toBe(1)
-  })
-
-  test('should insert both payment requests if second payment request has reference Id', async () => {
-    await savePaymentRequest(paymentRequest)
-    paymentRequest.referenceId = uuidv4()
-    await savePaymentRequest(paymentRequest)
-
-    const paymentRequestRow = await db.paymentRequest.findAll({
-      where: {
-        invoiceNumber: 'S00000001SFIP000001V001'
-      }
-    })
-
-    expect(paymentRequestRow.length).toBe(2)
-  })
-
-  test('should error for empty payment request', async () => {
-    paymentRequest = {}
-
-    try {
-      await savePaymentRequest(paymentRequest)
-    } catch (error) {
-      expect(error.message).toBeDefined()
-    }
-  })
-
-  test('should error for payment request without invoice lines', async () => {
-    delete paymentRequest.invoiceLines
-
-    try {
-      await savePaymentRequest(paymentRequest)
-    } catch (error) {
-      expect(error.message).toBeDefined()
-    }
+  test.each([
+    { desc: 'empty payment request', modify: () => { paymentRequest = {} } },
+    { desc: 'missing invoice lines', modify: () => { delete paymentRequest.invoiceLines } }
+  ])('should throw error for $desc', async ({ modify }) => {
+    modify()
+    await expect(savePaymentRequest(paymentRequest)).rejects.toThrow()
   })
 })
