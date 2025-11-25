@@ -5,7 +5,6 @@ let invoiceLine
 let lineId
 let source
 
-// Map scheme keys to payment request mocks
 let paymentRequests
 
 const schemesWithSubstring = [
@@ -54,8 +53,9 @@ describe('get ledger line for AP', () => {
     { desc: 'paymentRequest marketingYear fallback', removeFrom: 'invoice', expected: () => paymentRequests.sfi.marketingYear },
     { desc: 'marketingYear not present returns NOT_APPLICABLE', removeFrom: 'both', expected: () => NOT_APPLICABLE }
   ])('should return correct marketing year when $desc', ({ removeFrom, expected }) => {
-    if (removeFrom === 'invoice') delete invoiceLine.marketingYear
-    if (removeFrom === 'both') {
+    if (removeFrom === 'invoice') {
+      delete invoiceLine.marketingYear
+    } else if (removeFrom === 'both') {
       delete invoiceLine.marketingYear
       delete paymentRequests.sfi.marketingYear
     }
@@ -77,7 +77,10 @@ describe('get ledger line for AP', () => {
     { key: 'invoiceLine', index: 27 },
     { key: 'paymentRequest', index: 27 }
   ])('should return agreement number from $key when present', ({ key, index }) => {
-    if (key === 'paymentRequest') delete invoiceLine.agreementNumber
+    if (key === 'paymentRequest') {
+      delete invoiceLine.agreementNumber
+    }
+
     const result = getLedgerLineAP(invoiceLine, paymentRequests.cs, lineId, source)
     expect(result[index]).toBe(paymentRequests.cs.agreementNumber)
   })
@@ -86,7 +89,10 @@ describe('get ledger line for AP', () => {
     { key: 'invoiceLine', index: 13 },
     { key: 'paymentRequest', index: 13 }
   ])('should return agreement number from $key when AR', ({ key, index }) => {
-    if (key === 'paymentRequest') delete invoiceLine.agreementNumber
+    if (key === 'paymentRequest') {
+      delete invoiceLine.agreementNumber
+    }
+
     const result = getLedgerLineAR(invoiceLine, paymentRequests.cs, lineId, source)
     expect(result[index]).toBe(paymentRequests.cs.agreementNumber)
   })

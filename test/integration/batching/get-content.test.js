@@ -34,8 +34,12 @@ describe('get content', () => {
   test.each([undefined, null, '', 'delete'])(
     'should include correct content for AP if schedule is %p',
     (schedule) => {
-      if (schedule === 'delete') delete batch.paymentRequests[0].schedule
-      else batch.paymentRequests[0].schedule = schedule
+      if (schedule === 'delete') {
+        delete batch.paymentRequests[0].schedule
+      } else {
+        batch.paymentRequests[0].schedule = schedule
+      }
+
       expect(getContent(batch)).toStrictEqual(unscheduledAPRequest)
     }
   )
