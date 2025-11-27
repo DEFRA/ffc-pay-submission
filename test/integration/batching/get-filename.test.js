@@ -28,7 +28,7 @@ describe('get filename', () => {
     await db.sequelize.truncate({ cascade: true })
     await db.sequelize.close()
   })
-  
+
   test('should return filename for sequence 1', async () => {
     const filename = getFilename(batch, pillar)
     expect(filename).toMatch(/PFELM_0001_AP_\d{14} \(SITI\).csv/)
