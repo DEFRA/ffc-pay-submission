@@ -1,19 +1,13 @@
 const { DUE_DATE } = require('../../../mocks/values/due-date')
-
 const { ES, IMPS, SFI } = require('../../../../app/constants/schemes')
-
 const { getDueDate } = require('../../../../app/batching/vendor-lines/get-due-date')
 
 describe('get due date', () => {
-  test('returns empty string for ES', () => {
-    expect(getDueDate(ES, DUE_DATE)).toBe('')
-  })
-
-  test('returns empty string for IMPS', () => {
-    expect(getDueDate(IMPS, DUE_DATE)).toBe('')
-  })
-
-  test('returns due date for other schemes', () => {
-    expect(getDueDate(SFI, DUE_DATE)).toBe(DUE_DATE)
+  test.each([
+    { scheme: ES, expected: '' },
+    { scheme: IMPS, expected: '' },
+    { scheme: SFI, expected: DUE_DATE }
+  ])('returns $expected for $scheme scheme', ({ scheme, expected }) => {
+    expect(getDueDate(scheme, DUE_DATE)).toBe(expected)
   })
 })

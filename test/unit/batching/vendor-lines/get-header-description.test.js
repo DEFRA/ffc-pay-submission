@@ -1,5 +1,4 @@
 const { FC } = require('../../../../app/constants/schemes')
-
 const { getHeaderDescription } = require('../../../../app/batching/vendor-lines/get-header-description')
 
 let paymentRequest
@@ -7,48 +6,27 @@ let paymentRequest
 describe('get header description', () => {
   beforeEach(() => {
     paymentRequest = {
-      invoiceLines: [{
-        description: 'Description'
-      }]
+      invoiceLines: [{ description: 'Description' }]
     }
   })
 
   test('returns empty string if scheme is not FC', () => {
-    const result = getHeaderDescription(paymentRequest)
-    expect(result).toBe('')
+    expect(getHeaderDescription(paymentRequest)).toBe('')
   })
 
-  test('returns empty string if invoiceLines is empty and scheme is not FC', () => {
+  test.each([
+    { desc: 'invoiceLines is empty', lines: [] },
+    { desc: 'invoiceLines is undefined', lines: undefined },
+    { desc: 'invoiceLines is null', lines: null },
+    { desc: 'invoiceLines has no description', lines: [{}] }
+  ])('returns empty string if $desc and scheme is FC', ({ lines }) => {
     paymentRequest.schemeId = FC
-    paymentRequest.invoiceLines = []
-    const result = getHeaderDescription(paymentRequest)
-    expect(result).toBe('')
-  })
-
-  test('returns empty string if invoiceLines is undefined and scheme is FC', () => {
-    paymentRequest.schemeId = FC
-    paymentRequest.invoiceLines = undefined
-    const result = getHeaderDescription(paymentRequest)
-    expect(result).toBe('')
-  })
-
-  test('returns empty string if invoiceLines is null and scheme is FC', () => {
-    paymentRequest.schemeId = FC
-    paymentRequest.invoiceLines = null
-    const result = getHeaderDescription(paymentRequest)
-    expect(result).toBe('')
-  })
-
-  test('returns empty string if invoiceLines do not have description and scheme is FC', () => {
-    paymentRequest.schemeId = FC
-    paymentRequest.invoiceLines = [{}]
-    const result = getHeaderDescription(paymentRequest)
-    expect(result).toBe('')
+    paymentRequest.invoiceLines = lines
+    expect(getHeaderDescription(paymentRequest)).toBe('')
   })
 
   test('returns description if invoiceLines has description and scheme is FC', () => {
     paymentRequest.schemeId = FC
-    const result = getHeaderDescription(paymentRequest)
-    expect(result).toBe('Description')
+    expect(getHeaderDescription(paymentRequest)).toBe('Description')
   })
 })

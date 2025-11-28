@@ -46,31 +46,14 @@ describe('get filename', () => {
     expect(filename).toMatch(/PFELM_0001_AR_\d{14} \(SITI\).csv/)
   })
 
-  test('should return default manual filename if pillar is undefined', async () => {
-    batch.scheme.schemeId = MANUAL
-    const filename = getFilename(batch, pillar)
-    expect(filename).toMatch(/PFELM_0001_AP_\d{14} \(SITI\).csv/)
-  })
-
-  test('should return default manual filename if pillar is null', async () => {
-    pillar = null
-    batch.scheme.schemeId = MANUAL
-    const filename = getFilename(batch, pillar)
-    expect(filename).toMatch(/PFELM_0001_AP_\d{14} \(SITI\).csv/)
-  })
-
-  test('should return default manual filename if pillar is empty string', async () => {
-    pillar = ''
-    batch.scheme.schemeId = MANUAL
-    const filename = getFilename(batch, pillar)
-    expect(filename).toMatch(/PFELM_0001_AP_\d{14} \(SITI\).csv/)
-  })
-
-  test('should return default manual filename if pillar does not have own source', async () => {
-    pillar = 'Something'
-    batch.scheme.schemeId = MANUAL
-    const filename = getFilename(batch, pillar)
-    expect(filename).toMatch(/PFELM_0001_AP_\d{14} \(SITI\).csv/)
+  const fallbackVariants = [undefined, null, '', 'Something']
+  fallbackVariants.forEach(value => {
+    test(`should return default manual filename if pillar is ${value}`, async () => {
+      pillar = value
+      batch.scheme.schemeId = MANUAL
+      const filename = getFilename(batch, pillar)
+      expect(filename).toMatch(/PFELM_0001_AP_\d{14} \(SITI\).csv/)
+    })
   })
 
   test('should override manual filename if pillar has own source', async () => {
