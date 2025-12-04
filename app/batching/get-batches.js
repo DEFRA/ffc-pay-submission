@@ -10,19 +10,19 @@ const getBatches = async (transaction, started = new Date()) => {
 
 const getPendingBatches = async (started, transaction) => {
   const batches = await db.sequelize.query(`
-    SELECT
+    SELECT DISTINCT ON (batches."schemeId")
       batches.*
     FROM
       batches
-    INNER JOIN "paymentRequests" 
+    INNER JOIN "paymentRequests"
       ON "paymentRequests"."batchId" = batches."batchId"
     INNER JOIN "invoiceLines"
       ON "invoiceLines"."paymentRequestId" = "paymentRequests"."paymentRequestId"
     WHERE batches.published IS NULL
       AND ("batches"."started" IS NULL OR "batches"."started" <= :delay)
-    ORDER BY batches.sequence
-    LIMIT :batchCap
+    ORDER BY batches."schemeId", batches.sequence
     FOR UPDATE OF batches SKIP LOCKED
+    LIMIT :batchCap
     `, {
     replacements: {
       delay: moment(started).subtract(5, 'minutes').toDate(),
