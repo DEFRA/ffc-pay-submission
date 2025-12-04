@@ -13,7 +13,7 @@ const runGetBatches = async () =>
   db.sequelize.transaction(async (transaction) => {
     return await getBatches(transaction)
   }
-)
+  )
 
 describe('get batches', () => {
   beforeEach(async () => {
