@@ -1,42 +1,48 @@
 const db = require('../data')
 const moment = require('moment')
 const config = require('../config')
+const getBatchQuery = require('../constants/get-batch-query')
 
 const getBatches = async (transaction, started = new Date()) => {
-  const batches = await getPendingBatches(started, transaction)
-  await updateStarted(batches, started, transaction)
-  return batches
+  if (!transaction) {
+    throw new Error('getBatches must be called with a transaction')
+  }
+  try {
+    const batches = await getPendingBatches(started, transaction)
+    await updateStarted(batches, started, transaction)
+    return batches
+  } catch (error) {
+    console.error('Error in getBatches:', error)
+    throw error
+  }
 }
 
 const getPendingBatches = async (started, transaction) => {
-  const batches = await db.sequelize.query(`
-    SELECT
-      batches.*
-    FROM
-      batches
-    INNER JOIN "paymentRequests" 
-      ON "paymentRequests"."batchId" = batches."batchId"
-    INNER JOIN "invoiceLines"
-      ON "invoiceLines"."paymentRequestId" = "paymentRequests"."paymentRequestId"
-    WHERE batches.published IS NULL
-      AND ("batches"."started" IS NULL OR "batches"."started" <= :delay)
-    ORDER BY batches.sequence
-    LIMIT :batchCap
-    FOR UPDATE OF batches SKIP LOCKED
-    `, {
+  // Get one batch ID per scheme
+  const batchIdRows = await db.sequelize.query(getBatchQuery, {
     replacements: {
       delay: moment(started).subtract(5, 'minutes').toDate(),
       batchCap: config.batchCap
     },
     transaction,
-    raw: true,
     type: db.Sequelize.QueryTypes.SELECT
   })
 
-  if (!batches.length) {
+  const batchIds = batchIdRows.map(r => r.batchId)
+
+  if (!batchIds.length) {
     return []
   }
 
+  // Fetch full batch rows with FOR UPDATE
+  const batches = await db.batch.findAll({
+    where: { batchId: batchIds },
+    transaction,
+    lock: transaction.LOCK.UPDATE,
+    raw: true
+  })
+
+  // Fetch payment requests with invoice lines
   const paymentRequests = await db.paymentRequest.findAll({
     transaction,
     include: [{
@@ -45,12 +51,11 @@ const getPendingBatches = async (started, transaction) => {
       required: true
     }],
     where: {
-      batchId: {
-        [db.Sequelize.Op.in]: batches.map(x => x.batchId)
-      }
+      batchId: batchIds
     }
   })
 
+  // Fetch schemes with batch properties
   const schemes = await db.scheme.findAll({
     transaction,
     include: [{
@@ -65,19 +70,29 @@ const getPendingBatches = async (started, transaction) => {
     }
   })
 
-  return batches.map(x => ({
-    ...x,
-    paymentRequests: paymentRequests.filter(y => y.batchId === x.batchId).map(x => x.get({ plain: true })),
-    scheme: schemes.find(y => y.schemeId === x.schemeId).get({ plain: true })
-  }))
+  // Skip batches without a matching scheme (or transaction will fail for all)
+  return batches
+    .map(batch => {
+      const scheme = schemes.find(s => s.schemeId === batch.schemeId)
+      if (!scheme) {
+        return null
+      }
+
+      return {
+        ...batch,
+        paymentRequests: paymentRequests
+          .filter(pr => pr.batchId === batch.batchId)
+          .map(pr => pr.get({ plain: true })),
+        scheme: scheme.get({ plain: true })
+      }
+    })
+    .filter(Boolean)
 }
 
 const updateStarted = async (batches, started, transaction) => {
   for (const batch of batches) {
     await db.batch.update({ started }, {
-      where: {
-        batchId: batch.batchId
-      },
+      where: { batchId: batch.batchId },
       transaction
     })
   }
