@@ -117,4 +117,25 @@ describe('get batches', () => {
 
     config.batchCap = originalCap
   })
+
+  test('should throw if called without a transaction', async () => {
+    await expect(getBatches()).rejects.toThrow('getBatches must be called with a transaction')
+  })
+
+  test('should rethrow errors from inner functions', async () => {
+    await db.scheme.create(scheme)
+    await db.batchProperties.create(batchProperties)
+    await db.batch.create(batch)
+    await db.paymentRequest.create(paymentRequest)
+    await db.invoiceLine.create(invoiceLine)
+
+    // Mock internal function to force an error
+    const original = db.sequelize.query
+    db.sequelize.query = jest.fn(() => { throw new Error('forced failure') })
+
+    await expect(runGetBatches()).rejects.toThrow('forced failure')
+
+    // Restore original
+    db.sequelize.query = original
+  })
 })

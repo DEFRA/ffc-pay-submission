@@ -91,7 +91,9 @@ const getPendingBatches = async (started, transaction) => {
   return batches
     .map(batch => {
       const scheme = schemes.find(s => s.schemeId === batch.schemeId)
-      if (!scheme) return null
+      if (!scheme) {
+        return null
+      }
 
       return {
         ...batch,
