@@ -122,6 +122,28 @@ describe('get batches', () => {
     await expect(getBatches()).rejects.toThrow('getBatches must be called with a transaction')
   })
 
+  test('should log and rethrow errors in getBatches', async () => {
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+
+    const fakeTransaction = {
+      LOCK: { UPDATE: 'UPDATE' }
+    }
+
+    // Force error
+    const originalQuery = db.sequelize.query
+    db.sequelize.query = jest.fn(() => { throw new Error('boom') })
+
+    await expect(getBatches(fakeTransaction)).rejects.toThrow('boom')
+
+    expect(consoleSpy).toHaveBeenCalledWith(
+      'Error in getBatches:',
+      expect.any(Error)
+    )
+
+    db.sequelize.query = originalQuery
+    consoleSpy.mockRestore()
+  })
+
   test('should rethrow errors from inner functions', async () => {
     await db.scheme.create(scheme)
     await db.batchProperties.create(batchProperties)
