@@ -37,7 +37,6 @@ describe('process payment message', () => {
   })
 
   test('should send event when inbound save fails', async () => {
-    // 🔥 force awaited promise to throw
     savePaymentRequest.mockRejectedValue(new Error('boom'))
 
     const message = {
