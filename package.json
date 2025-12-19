@@ -1,6 +1,6 @@
 {
   "name": "ffc-pay-submission",
-  "version": "1.27.20",
+  "version": "1.27.21",
   "description": "FFC payment submission service",
   "homepage": "https://github.com/DEFRA/ffc-pay-submission",
   "main": "app/index.js",
@@ -33,7 +33,7 @@
     "applicationinsights": "2.9.6",
     "ffc-database": "1.0.23",
     "ffc-messaging": "2.10.1",
-    "ffc-pay-event-publisher": "1.2.1",
+    "ffc-pay-event-publisher": "1.2.0",
     "hapi-pino": "13.0.0",
     "joi": "17.6.0",
     "log-timestamp": "0.3.0",
