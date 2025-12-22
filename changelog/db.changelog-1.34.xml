@@ -11,6 +11,10 @@
             </sqlCheck>
         </preConditions>
 
+        <delete tableName="sequences">
+            <where>"schemeId" = 7</where>
+        </delete>
+
         <delete tableName="batchProperties">
             <where>"schemeId" = 7</where>
         </delete>
