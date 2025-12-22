@@ -1,9 +1,8 @@
-const { BPS, FDMR, ES, FC, IMPS } = require('../../constants/schemes')
+const { BPS, ES, FC, IMPS } = require('../../constants/schemes')
 
 const getPaymentDescription = (schemeId) => {
   switch (schemeId) {
     case BPS:
-    case FDMR:
     case ES:
     case FC:
       return ''

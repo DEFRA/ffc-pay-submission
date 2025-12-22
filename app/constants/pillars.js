@@ -26,7 +26,6 @@ module.exports = {
   AHWR: 'AHWR',
   CS: 'CS',
   BPS: 'BPS',
-  FDMR: 'FDMR',
   ES: 'ES',
   FC: 'FC',
   IMPS: 'IMPS',
