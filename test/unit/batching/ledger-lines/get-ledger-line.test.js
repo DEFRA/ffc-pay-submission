@@ -8,8 +8,7 @@ let source
 let paymentRequests
 
 const schemesWithSubstring = [
-  { key: 'bps', description: 'Gross value of claim' },
-  { key: 'fdmr', description: 'Gross value of claim' }
+  { key: 'bps', description: 'Gross value of claim' }
 ]
 
 const schemesFullDescription = [
@@ -35,7 +34,6 @@ beforeEach(() => {
     vetVisits: structuredClone(require('../../../mocks/payment-requests/vet-visits')),
     cs: structuredClone(require('../../../mocks/payment-requests/cs')),
     bps: structuredClone(require('../../../mocks/payment-requests/bps')),
-    fdmr: structuredClone(require('../../../mocks/payment-requests/fdmr')),
     sfi23: structuredClone(require('../../../mocks/payment-requests/sfi23')),
     delinked: structuredClone(require('../../../mocks/payment-requests/delinked')),
     sfiExpanded: structuredClone(require('../../../mocks/payment-requests/sfi-expanded')),
