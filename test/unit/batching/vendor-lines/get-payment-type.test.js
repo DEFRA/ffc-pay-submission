@@ -1,5 +1,5 @@
 const {
-  BPS, CS, FDMR, LumpSums, SFI, SFIP, VetVisits, IMPS, ES,
+  BPS, CS, LumpSums, SFI, SFIP, VetVisits, IMPS, ES,
   SFI23, Delinked, SFIExpanded, SITICOHTC, SITICOHTR
 } = require('../../../../app/constants/schemes')
 const { getPaymentType } = require('../../../../app/batching/vendor-lines/get-payment-type')
@@ -11,8 +11,6 @@ describe('get payment type', () => {
     { scheme: CS, paymentType: '2', expected: 0 },
     { scheme: BPS, paymentType: undefined, expected: '' },
     { scheme: BPS, paymentType: '0', expected: '' },
-    { scheme: FDMR, paymentType: undefined, expected: '' },
-    { scheme: FDMR, paymentType: '0', expected: '' },
     { scheme: LumpSums, paymentType: '0', expected: 0 },
     { scheme: SFI, paymentType: '0', expected: 0 },
     { scheme: SFIP, paymentType: '0', expected: 0 },
