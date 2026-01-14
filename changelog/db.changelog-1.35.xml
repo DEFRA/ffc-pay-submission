@@ -19,6 +19,28 @@
             <where>"schemeId" = 7</where>
         </delete>
 
+        <sql>
+            DELETE FROM public."queue" q
+            USING public."paymentRequests" pr
+            WHERE q."paymentRequestId" = pr."paymentRequestId"
+                AND pr."schemeId" = 7;
+        </sql>
+
+        <sql>
+            DELETE FROM public."invoiceLines" il
+            USING public."paymentRequests" pr
+            WHERE il."paymentRequestId" = pr."paymentRequestId"
+                AND pr."schemeId" = 7;
+        </sql>
+
+        <delete tableName="paymentRequests">
+            <where>"schemeId" = 7</where>
+        </delete>
+
+        <delete tableName="batches">
+            <where>"schemeId" = 7</where>
+        </delete>
+
         <delete tableName="schemes">
             <where>"schemeId" = 7</where>
         </delete>
