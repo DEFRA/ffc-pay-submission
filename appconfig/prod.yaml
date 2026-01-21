@@ -1,15 +1,15 @@
 ---
 environment: production
-environmentCode: dev
+environmentCode: prd
 container:
-  messageQueueHost: DEVFFCINFSB1001.servicebus.windows.net
+  messageQueueHost: PRDFFCINFSB1001.servicebus.windows.net
   processingActive: true
   useV2ReturnFiles: true
-  paymentSubmitTopicAddress: ffc-pay-submit-dev
+  paymentSubmitTopicAddress: ffc-pay-submit
   paymentSubmitSubscriptionAddress: ffc-pay-submission
-  fileSendTopicAddress: ffc-pay-file-send-dev
-  eventsTopicAddress: ffc-pay-events-dev
-  azureStorageAccountName: devffcpayst1001
+  fileSendTopicAddress: ffc-pay-file-send
+  eventsTopicAddress: ffc-pay-events
+  azureStorageAccountName: prdffcpayst1001
   azureStorageConnectionString: dummy
   azureStorageUseConnectionString: false
   azureStorageCreateContainers: false
@@ -19,24 +19,24 @@ container:
   batchSize: 2000
   batchCap: 1
 postgresService:
-  postgresDb: ffc-pay-submission-dev
-  postgresqlHost: devffcdbssq1001.postgres.database.azure.com
+  postgresDb: ffc-pay-submission-prd
+  postgresqlHost: prdffcdbssq1001.postgres.database.azure.com
   postgresPort: 5432
   postgresSchema: public
 secretProviderClass:
   azure:
-    keyvaultName: DEVFFCINFKV1001
+    keyvaultName: PRDFFCINFKV1001
     objects:
-      - objectName: devtest-ffcahwr-appInsights-connectionString
+      - objectName: prd-ffcahwr-appInsights-connectionString
         objectType: secret
-      - objectName: dev-postrgresPaySubmissionUser
+      - objectName: prd-postrgresPaySubmissionUser
         objectType: secret
 
   secretObjects:
     - secretName: ffc-pay-submission
       type: Opaque
       data:
-        - objectName: devtest-ffcahwr-appInsights-connectionString
+        - objectName: prd-ffcahwr-appInsights-connectionString
           key: APPINSIGHTS_CONNECTIONSTRING
-        - objectName: dev-postrgresPaySubmissionUser
+        - objectName: prd-postrgresPaySubmissionUser
           key: POSTGRES_USERNAME

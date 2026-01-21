@@ -2,12 +2,25 @@ resources:
   identity: pay-submission
   postgreSql:
     name: ffc-pay-submission
-  topics:
-    - name: ffc-pay-submit
-      role: receiver
-      subscriptions:
-        - name: ffc-pay-submission
-    - name: ffc-pay-file-send
-      role: sender
-    - name: ffc-pay-events
-      role: sender
+  service_bus:
+    topics:
+      - name: ffc-pay-submit
+        defaultMessageTimeToLive: P3650D
+        duplicateDetectionHistoryTimeWindow: PT10M30S
+        requiresDuplicateDetection: true
+        roles: 
+        - name: receiver
+        subscriptions:
+          - name: ffc-pay-submission
+      - name: ffc-pay-events
+        defaultMessageTimeToLive: P3650D
+        duplicateDetectionHistoryTimeWindow: PT10M30S
+        requiresDuplicateDetection: true
+        roles: 
+        - name: sender
+      - name: ffc-pay-file-send
+        defaultMessageTimeToLive: P3650D
+        duplicateDetectionHistoryTimeWindow: PT10M30S
+        requiresDuplicateDetection: true
+        roles: 
+        - name: sender

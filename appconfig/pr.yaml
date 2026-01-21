@@ -1,6 +1,6 @@
 ---
 environment: production
-environmentCode: snd
+environmentCode: snd2
 pr: true
 container:
   messageQueueHost: DEVFFCINFSB1001.servicebus.windows.net

@@ -7,12 +7,10 @@ data:
   PROCESSING_ACTIVE: {{ quote .Values.container.processingActive }}
   {{- if and (.Values.environmentCode) (not .Values.pr) }}
   PAYMENTSUBMIT_TOPIC_ADDRESS: {{ .Values.container.paymentSubmitTopicAddress }}-{{ .Values.environmentCode }}
-  EVENT_TOPIC_ADDRESS: {{ .Values.container.eventTopicAddress }}-{{ .Values.environmentCode }}
   EVENTS_TOPIC_ADDRESS: {{ .Values.container.eventsTopicAddress }}-{{ .Values.environmentCode }}
   FILESEND_TOPIC_ADDRESS: {{ .Values.container.fileSendTopicAddress }}-{{ .Values.environmentCode }}
   {{ else }}
   PAYMENTSUBMIT_TOPIC_ADDRESS: {{ quote .Values.container.paymentSubmitTopicAddress }}
-  EVENT_TOPIC_ADDRESS: {{ quote .Values.container.eventTopicAddress }}
   EVENTS_TOPIC_ADDRESS: {{ quote .Values.container.eventsTopicAddress }}
   FILESEND_TOPIC_ADDRESS: {{ quote .Values.container.fileSendTopicAddress }}
   {{- end }}
