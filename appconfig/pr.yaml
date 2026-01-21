@@ -3,7 +3,7 @@ environment: production
 environmentCode: snd2
 pr: true
 container:
-  messageQueueHost: DEVFFCINFSB1001.servicebus.windows.net
+  messageQueueHost: SNDFFCINFSB2001.servicebus.windows.net
   processingActive: true
   useV2ReturnFiles: true
   paymentSubmitTopicAddress: topic:ffc-pay-submit
