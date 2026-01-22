@@ -6,10 +6,10 @@ container:
   messageQueueHost: DEVFFCINFSB1001.servicebus.windows.net
   processingActive: true
   useV2ReturnFiles: true
-  paymentSubmitTopicAddress: topic:ffc-pay-submit
+  paymentSubmitTopicAddress: ffc-pay-submit-snd2
   paymentSubmitSubscriptionAddress: ffc-pay-submission
-  fileSendTopicAddress: topic:ffc-pay-file-send
-  eventsTopicAddress: topic:ffc-pay-events
+  fileSendTopicAddress: ffc-pay-file-send-snd2
+  eventsTopicAddress: ffc-pay-events-snd2
   azureStorageAccountName: snd2ffcpayst2001
   azureStorageConnectionString: dummy
   azureStorageUseConnectionString: false

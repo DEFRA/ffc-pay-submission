@@ -12,7 +12,8 @@
               "DuplicateDetectionHistoryTimeWindow": "PT20S",
               "RequiresDuplicateDetection": false
             },
-            "Subscriptions": [{
+            "Subscriptions": [
+              {
                 "Name": "ffc-pay-submission",
                 "Properties": {
                   "DeadLetteringOnMessageExpiration": false,
@@ -23,7 +24,8 @@
                   "ForwardTo": "",
                   "RequiresSession": false
                 }
-              }]
+              }
+            ]
           },
           {
             "Name": "ffc-pay-events",
