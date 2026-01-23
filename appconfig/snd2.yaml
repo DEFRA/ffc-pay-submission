@@ -4,8 +4,6 @@ environmentCode: snd
 pr: true
 container:
   messageQueueHost: DEVFFCINFSB1001.servicebus.windows.net
-  processingActive: true
-  useV2ReturnFiles: true
   paymentSubmitTopicAddress: ffc-pay-submit-snd2
   paymentSubmitSubscriptionAddress: ffc-pay-submission
   fileSendTopicAddress: ffc-pay-file-send-snd2
@@ -16,11 +14,3 @@ container:
   azureStorageCreateContainers: false
   storageContainer: dax
   storageFolder: outbound
-  batchGenerationInterval: 1800000
-  batchSize: 2000
-  batchCap: 1
-postgresService:
-  postgresDb: ffc-pay-submission-snd2
-  postgresqlHost: snd2ffcdbssq1001.postgres.database.azure.com
-  postgresPort: 5432
-  postgresSchema: public

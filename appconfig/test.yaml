@@ -3,8 +3,6 @@ environment: production
 environmentCode: test
 container:
   messageQueueHost: DEVFFCINFSB1001.servicebus.windows.net
-  processingActive: true
-  useV2ReturnFiles: true
   paymentSubmitTopicAddress: ffc-pay-submit-test
   paymentSubmitSubscriptionAddress: ffc-pay-submission
   fileSendTopicAddress: ffc-pay-file-send-test
@@ -15,21 +13,11 @@ container:
   azureStorageCreateContainers: false
   storageContainer: dax
   storageFolder: outbound
-  batchGenerationInterval: 1800000
-  batchSize: 2000
-  batchCap: 1
-postgresService:
-  postgresDb: ffc-pay-submission-test
-  postgresqlHost: devffcdbssq1001.postgres.database.azure.com
-  postgresPort: 5432
-  postgresSchema: public
 secretProviderClass:
   azure:
     keyvaultName: DEVFFCINFKV1001
     objects:
       - objectName: devtest-ffcahwr-appInsights-connectionString
-        objectType: secret
-      - objectName: dev-postrgresPaySubmissionUser
         objectType: secret
 
   secretObjects:
@@ -38,5 +26,3 @@ secretProviderClass:
       data:
         - objectName: devtest-ffcahwr-appInsights-connectionString
           key: APPINSIGHTS_CONNECTIONSTRING
-        - objectName: dev-postrgresPaySubmissionUser
-          key: POSTGRES_USERNAME

@@ -3,8 +3,6 @@ environment: production
 environmentCode: pre
 container:
   messageQueueHost: PREFFCINFSB1001.servicebus.windows.net
-  processingActive: true
-  useV2ReturnFiles: true
   paymentSubmitTopicAddress: ffc-pay-submit-pre
   paymentSubmitSubscriptionAddress: ffc-pay-submission
   fileSendTopicAddress: ffc-pay-file-send-pre
@@ -15,21 +13,11 @@ container:
   azureStorageCreateContainers: false
   storageContainer: dax
   storageFolder: outbound
-  batchGenerationInterval: 1800000
-  batchSize: 2000
-  batchCap: 1
-postgresService:
-  postgresDb: ffc-pay-submission-pre
-  postgresqlHost: preffcdbssq1001.postgres.database.azure.com
-  postgresPort: 5432
-  postgresSchema: public
 secretProviderClass:
   azure:
     keyvaultName: PREFFCINFKV1001
     objects:
       - objectName: pre-ffcahwr-appInsights-connectionString
-        objectType: secret
-      - objectName: pre-postgresPaySubmissionUser
         objectType: secret
 
   secretObjects:
@@ -38,5 +26,3 @@ secretProviderClass:
       data:
         - objectName: pre-ffcahwr-appInsights-connectionString
           key: APPINSIGHTS_CONNECTIONSTRING
-        - objectName: pre-postgresPaySubmissionUser
-          key: POSTGRES_USERNAME

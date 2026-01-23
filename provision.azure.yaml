@@ -24,3 +24,11 @@ resources:
         requiresDuplicateDetection: true
         roles: 
         - name: sender
+  storage_accounts:
+    - name: pay
+      containers:
+        - name: dax
+          roles:
+            - name: blobContributor
+      roles:
+        - name: storageAccountContributor

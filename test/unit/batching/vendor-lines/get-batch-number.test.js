@@ -1,4 +1,3 @@
-const config = require('../../../../app/config')
 const { ES, SFI, FC, IMPS } = require('../../../../app/constants/schemes')
 const { getBatchNumber } = require('../../../../app/batching/vendor-lines/get-batch-number')
 
@@ -20,20 +19,14 @@ describe('get batch number', () => {
     expect(getBatchNumber(SFI, sequence)).toBe(expected)
   })
 
-  describe.each([true, false])('when useV2ReturnFiles is %s', (useV2) => {
-    beforeEach(() => {
-      config.useV2ReturnFiles = useV2
-    })
+  const cases = [
+    { scheme: FC, batchName: 'FCAP_2023_001.dat', expected: '2023' },
+    { scheme: IMPS, batchName: 'FIN_IMPS_AP_123.INT', expected: '123' },
+    { scheme: FC, batchName: 'INVALID_BATCH_NAME.dat', expected: '0001' },
+    { scheme: IMPS, batchName: 'INVALID_BATCH_NAME.INT', expected: '0001' }
+  ]
 
-    const cases = [
-      { scheme: FC, batchName: 'FCAP_2023_001.dat', expected: useV2 ? '2023' : '0001' },
-      { scheme: IMPS, batchName: 'FIN_IMPS_AP_123.INT', expected: useV2 ? '123' : '0001' },
-      { scheme: FC, batchName: 'INVALID_BATCH_NAME.dat', expected: '0001' },
-      { scheme: IMPS, batchName: 'INVALID_BATCH_NAME.INT', expected: '0001' }
-    ]
-
-    test.each(cases)('returns correct batch number for $scheme with batch "$batchName"', ({ scheme, batchName, expected }) => {
-      expect(getBatchNumber(scheme, 1, batchName)).toBe(expected)
-    })
+  test.each(cases)('returns correct batch number for $scheme with batch "$batchName"', ({ scheme, batchName, expected }) => {
+    expect(getBatchNumber(scheme, 1, batchName)).toBe(expected)
   })
 })
