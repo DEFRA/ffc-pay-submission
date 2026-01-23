@@ -1,9 +1,9 @@
 ---
 environment: production
-environmentCode: snd
+environmentCode: snd2
 pr: true
 container:
-  messageQueueHost: DEVFFCINFSB1001.servicebus.windows.net
+  messageQueueHost: SNDFFCINFSB2001.servicebus.windows.net
   paymentSubmitTopicAddress: ffc-pay-submit-snd2
   paymentSubmitSubscriptionAddress: ffc-pay-submission
   fileSendTopicAddress: ffc-pay-file-send-snd2
