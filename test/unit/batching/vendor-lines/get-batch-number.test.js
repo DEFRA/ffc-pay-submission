@@ -29,4 +29,21 @@ describe('get batch number', () => {
   test.each(cases)('returns correct batch number for $scheme with batch "$batchName"', ({ scheme, batchName, expected }) => {
     expect(getBatchNumber(scheme, 1, batchName)).toBe(expected)
   })
+
+  test('extracts year from FC batch name with leading zeros', () => {
+    expect(getBatchNumber(FC, 1, 'FCAP_0001_001.dat')).toBe('0001')
+  })
+
+  test('extracts batch number from IMPS with R variant', () => {
+    expect(getBatchNumber(IMPS, 1, 'FIN_IMPS_AR_456.INT')).toBe('456')
+  })
+
+  test('handles IMPS batch name with no digits in capture group', () => {
+    expect(getBatchNumber(IMPS, 5, 'FIN_IMPS_AP_.INT')).toBe('0005')
+  })
+
+  test('pads sequence when it exceeds 4 digits', () => {
+    expect(getBatchNumber(SFI, 10000)).toBe('10000')
+    expect(getBatchNumber(SFI, 99999)).toBe('99999')
+  })
 })
