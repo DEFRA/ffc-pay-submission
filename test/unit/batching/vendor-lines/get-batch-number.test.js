@@ -46,4 +46,9 @@ describe('get batch number', () => {
     expect(getBatchNumber(SFI, 10000)).toBe('10000')
     expect(getBatchNumber(SFI, 99999)).toBe('99999')
   })
+
+  test('pads sequence when FC or IMPS scheme has no batch name', () => {
+    expect(getBatchNumber(FC, 5)).toBe('0005')
+    expect(getBatchNumber(IMPS, 10)).toBe('0010')
+  })
 })
