@@ -15,7 +15,7 @@ containerConfigMap:
   name: ffc-pay-submission-config-map
 
 containerSecret:
-  name: ffc-pay-submission-container-secret
+  name: ffc-pay-submission
   type: Opaque
 
 deployment:

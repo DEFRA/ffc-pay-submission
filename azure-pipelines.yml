@@ -46,32 +46,32 @@ extends:
     # failOnThreshold: moderate
     variableGroupName: ffc-pay-submission-env-var
     pr_params:
-      processingActive: $(pr_processingActive)
+      processingActive: ${{ eq(variables['pr_processingActive'], 'true') }}
       batchGenerationInterval: $(pr_batchGenerationInterval)
       batchSize: $(pr_batchSize)
       batchCap: $(pr_batchCap)
     snd2_params:
-      processingActive: $(snd2_processingActive)
+      processingActive: ${{ eq(variables['snd2_processingActive'], 'true') }}
       batchGenerationInterval: $(snd2_batchGenerationInterval)
       batchSize: $(snd2_batchSize)
       batchCap: $(snd2_batchCap)
     dev_params:
-      processingActive: $(dev_processingActive)
+      processingActive: ${{ eq(variables['dev_processingActive'], 'true') }}
       batchGenerationInterval: $(dev_batchGenerationInterval)
       batchSize: $(dev_batchSize)
       batchCap: $(dev_batchCap)
     test_params:
-      processingActive: $(test_processingActive)
+      processingActive: ${{ eq(variables['test_processingActive'], 'true') }}
       batchGenerationInterval: $(test_batchGenerationInterval)
       batchSize: $(test_batchSize)
       batchCap: $(test_batchCap)
     pre_params:
-      processingActive: $(pre_processingActive)
+      processingActive: ${{ eq(variables['pre_processingActive'], 'true') }}
       batchGenerationInterval: $(pre_batchGenerationInterval)
       batchSize: $(pre_batchSize)
       batchCap: $(pre_batchCap)
     prd_params:
-      processingActive: $(prd_processingActive)
+      processingActive: ${{ eq(variables['prd_processingActive'], 'true') }}
       batchGenerationInterval: $(prd_batchGenerationInterval)
       batchSize: $(prd_batchSize)
       batchCap: $(prd_batchCap)
