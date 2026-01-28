@@ -5,14 +5,12 @@ data:
   APPINSIGHTS_CLOUDROLE: {{ quote .Values.name }}
   MESSAGE_QUEUE_HOST: {{ quote .Values.container.messageQueueHost }}
   PROCESSING_ACTIVE: {{ quote .Values.container.processingActive }}
-  {{- if and (.Values.environmentCode) (not .Values.pr) }}
+  {{- if (.Values.environmentCode) }}
   PAYMENTSUBMIT_TOPIC_ADDRESS: {{ .Values.container.paymentSubmitTopicAddress }}-{{ .Values.environmentCode }}
-  EVENT_TOPIC_ADDRESS: {{ .Values.container.eventTopicAddress }}-{{ .Values.environmentCode }}
   EVENTS_TOPIC_ADDRESS: {{ .Values.container.eventsTopicAddress }}-{{ .Values.environmentCode }}
   FILESEND_TOPIC_ADDRESS: {{ .Values.container.fileSendTopicAddress }}-{{ .Values.environmentCode }}
   {{ else }}
   PAYMENTSUBMIT_TOPIC_ADDRESS: {{ quote .Values.container.paymentSubmitTopicAddress }}
-  EVENT_TOPIC_ADDRESS: {{ quote .Values.container.eventTopicAddress }}
   EVENTS_TOPIC_ADDRESS: {{ quote .Values.container.eventsTopicAddress }}
   FILESEND_TOPIC_ADDRESS: {{ quote .Values.container.fileSendTopicAddress }}
   {{- end }}
@@ -21,6 +19,7 @@ data:
   POSTGRES_HOST: {{ quote .Values.postgresService.postgresqlHost }}
   POSTGRES_PORT: {{ quote .Values.postgresService.postgresPort }}
   POSTGRES_SCHEMA_NAME: {{ quote .Values.postgresService.postgresSchema }}
+  POSTGRES_USERNAME: {{ .Values.postgresService.postgresUser | quote }}
   AZURE_STORAGE_ACCOUNT_NAME: {{ quote .Values.container.azureStorageAccountName }}
   AZURE_STORAGE_CONNECTION_STRING: {{ quote .Values.container.azureStorageConnectionString }}
   AZURE_STORAGE_USE_CONNECTION_STRING: {{ quote .Values.container.azureStorageUseConnectionString }}
@@ -30,5 +29,4 @@ data:
   BATCH_INTERVAL: {{ quote .Values.container.batchGenerationInterval }}
   BATCH_SIZE: {{ quote .Values.container.batchSize }}
   BATCH_CAP: {{ quote .Values.container.batchCap }}
-  USE_V2_RETURN_FILES: {{ quote .Values.container.useV2ReturnFiles }}
 {{- end -}}

@@ -1,0 +1,77 @@
+# Pipeline name convention
+name: '$(Build.SourceBranchName)$(System.PullRequest.SourceBranch)$(Rev:.r)'
+
+# Trigger configuration
+trigger:
+  - main
+  - feature/*
+  - release/*
+
+pr:
+  - main
+  - releases/*
+
+# Parameters
+parameters:
+  - name: prDeployment
+    type: boolean
+    default: true
+  - name: branchDeployment
+    type: boolean
+    default: true
+  - name: sndDeployment
+    type: boolean
+    default: true
+
+# Resources
+resources:
+  repositories:
+    - repository: templates
+      endpoint: DEFRA
+      type: github
+      name: defra/fcp-pipeline-common
+      ref: pl-1043  # Optional: build with a specific pipeline version
+
+# Pipeline template
+extends:
+  template: fcp-common-pipeline.yaml@templates
+  parameters:
+    appFrameworkType: nodejs   # Optional: nodejs (default), dotnet, java
+    Type: kubernetes           # Optional: kubernetes (default), npm, functions, nuget
+    npmLegacyPeerDeps: false   # Optional: default is false
+    dockerFilePath: Dockerfile # Optional default is Dockerfile
+    prDeployment: ${{ parameters.prDeployment }}
+    branchDeployment: ${{ parameters.branchDeployment }}
+    sndDeployment: ${{ parameters.sndDeployment }}
+    # failOnThreshold: moderate
+    variableGroupName: ffc-pay-submission-env-var
+    pr_params:
+      processingActive: ${{ eq(variables['pr_processingActive'], 'true') }}
+      batchGenerationInterval: $(pr_batchGenerationInterval)
+      batchSize: $(pr_batchSize)
+      batchCap: $(pr_batchCap)
+    snd2_params:
+      processingActive: ${{ eq(variables['snd2_processingActive'], 'true') }}
+      batchGenerationInterval: $(snd2_batchGenerationInterval)
+      batchSize: $(snd2_batchSize)
+      batchCap: $(snd2_batchCap)
+    dev_params:
+      processingActive: ${{ eq(variables['dev_processingActive'], 'true') }}
+      batchGenerationInterval: $(dev_batchGenerationInterval)
+      batchSize: $(dev_batchSize)
+      batchCap: $(dev_batchCap)
+    test_params:
+      processingActive: ${{ eq(variables['test_processingActive'], 'true') }}
+      batchGenerationInterval: $(test_batchGenerationInterval)
+      batchSize: $(test_batchSize)
+      batchCap: $(test_batchCap)
+    pre_params:
+      processingActive: ${{ eq(variables['pre_processingActive'], 'true') }}
+      batchGenerationInterval: $(pre_batchGenerationInterval)
+      batchSize: $(pre_batchSize)
+      batchCap: $(pre_batchCap)
+    prd_params:
+      processingActive: ${{ eq(variables['prd_processingActive'], 'true') }}
+      batchGenerationInterval: $(prd_batchGenerationInterval)
+      batchSize: $(prd_batchSize)
+      batchCap: $(prd_batchCap)
