@@ -3,10 +3,10 @@ environment: production
 environmentCode: dev
 container:
   messageQueueHost: DEVFFCINFSB1001.servicebus.windows.net
-  paymentSubmitTopicAddress: ffc-pay-submit-dev
+  paymentSubmitTopicAddress: ffc-pay-submit
   paymentSubmitSubscriptionAddress: ffc-pay-submission
-  fileSendTopicAddress: ffc-pay-file-send-dev
-  eventsTopicAddress: ffc-pay-events-dev
+  fileSendTopicAddress: ffc-pay-file-send
+  eventsTopicAddress: ffc-pay-events
   azureStorageAccountName: devffcpayst1001
   azureStorageConnectionString: dummy
   azureStorageUseConnectionString: false

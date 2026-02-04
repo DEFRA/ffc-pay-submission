@@ -3,10 +3,10 @@ environment: production
 environmentCode: prd
 container:
   messageQueueHost: PRDFFCINFSB1001.servicebus.windows.net
-  paymentSubmitTopicAddress: ffc-pay-submit-prd
+  paymentSubmitTopicAddress: ffc-pay-submit
   paymentSubmitSubscriptionAddress: ffc-pay-submission
-  fileSendTopicAddress: ffc-pay-file-send-prd
-  eventsTopicAddress: ffc-pay-events-prd
+  fileSendTopicAddress: ffc-pay-file-send
+  eventsTopicAddress: ffc-pay-events
   azureStorageAccountName: prdffcpayst1001
   azureStorageConnectionString: dummy
   azureStorageUseConnectionString: false
