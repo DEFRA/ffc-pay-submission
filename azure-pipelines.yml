@@ -46,32 +46,32 @@ extends:
     # failOnThreshold: moderate
     variableGroupName: ffc-pay-submission-env-var
     pr_params:
-      processingActive: ${{ eq(variables['pr_processingActive'], 'true') }}
-      batchGenerationInterval: $(pr_batchGenerationInterval)
-      batchSize: $(pr_batchSize)
-      batchCap: $(pr_batchCap)
+      container.processingActive: ${{ eq(variables['pr_processingActive'], 'true') }}
+      container.batchGenerationInterval: $(pr_batchGenerationInterval)
+      container.batchSize: $(pr_batchSize)
+      container.batchCap: $(pr_batchCap)
     snd2_params:
-      processingActive: ${{ eq(variables['snd2_processingActive'], 'true') }}
-      batchGenerationInterval: $(snd2_batchGenerationInterval)
-      batchSize: $(snd2_batchSize)
-      batchCap: $(snd2_batchCap)
+      container.processingActive: ${{ eq(variables['snd2_processingActive'], 'true') }}
+      container.batchGenerationInterval: $(snd2_batchGenerationInterval)
+      container.batchSize: $(snd2_batchSize)
+      container.batchCap: $(snd2_batchCap)
     dev_params:
-      processingActive: ${{ eq(variables['dev_processingActive'], 'true') }}
-      batchGenerationInterval: $(dev_batchGenerationInterval)
-      batchSize: $(dev_batchSize)
-      batchCap: $(dev_batchCap)
+      container.processingActive: ${{ eq(variables['dev_processingActive'], 'true') }}
+      container.batchGenerationInterval: $(dev_batchGenerationInterval)
+      container.batchSize: $(dev_batchSize)
+      container.batchCap: $(dev_batchCap)
     test_params:
-      processingActive: ${{ eq(variables['test_processingActive'], 'true') }}
-      batchGenerationInterval: $(test_batchGenerationInterval)
-      batchSize: $(test_batchSize)
-      batchCap: $(test_batchCap)
+      container.processingActive: ${{ eq(variables['test_processingActive'], 'true') }}
+      container.batchGenerationInterval: $(test_batchGenerationInterval)
+      container.batchSize: $(test_batchSize)
+      container.batchCap: $(test_batchCap)
     pre_params:
-      processingActive: ${{ eq(variables['pre_processingActive'], 'true') }}
-      batchGenerationInterval: $(pre_batchGenerationInterval)
-      batchSize: $(pre_batchSize)
-      batchCap: $(pre_batchCap)
+      container.processingActive: ${{ eq(variables['pre_processingActive'], 'true') }}
+      container.batchGenerationInterval: $(pre_batchGenerationInterval)
+      container.batchSize: $(pre_batchSize)
+      container.batchCap: $(pre_batchCap)
     prd_params:
-      processingActive: ${{ eq(variables['prd_processingActive'], 'true') }}
-      batchGenerationInterval: $(prd_batchGenerationInterval)
-      batchSize: $(prd_batchSize)
-      batchCap: $(prd_batchCap)
+      container.processingActive: ${{ eq(variables['prd_processingActive'], 'true') }}
+      container.batchGenerationInterval: $(prd_batchGenerationInterval)
+      container.batchSize: $(prd_batchSize)
+      container.batchCap: $(prd_batchCap)
