@@ -1,5 +1,9 @@
 const { NOT_APPLICABLE } = require('../../../../app/constants/not-applicable')
 const { getLedgerLineAP, getLedgerLineAR } = require('../../../../app/batching/ledger-lines/get-ledger-line')
+const { getValueMultiplier } = require('../../../../app/batching/get-value-multiplier')
+const { convertToPounds } = require('../../../../app/currency-convert')
+
+jest.mock('../../../../app/batching/get-value-multiplier')
 
 let invoiceLine
 let lineId
@@ -11,20 +15,24 @@ const schemesWithSubstring = [
   { key: 'bps', description: 'Gross value of claim' }
 ]
 
+const description = 'G00 - Gross value of claim'
 const schemesFullDescription = [
-  { key: 'sfi', description: 'G00 - Gross value of claim' },
-  { key: 'sfiPilot', description: 'G00 - Gross value of claim' },
-  { key: 'lumpSums', description: 'G00 - Gross value of claim' },
-  { key: 'vetVisits', description: 'G00 - Gross value of claim' },
-  { key: 'cs', description: 'G00 - Gross value of claim' },
-  { key: 'sfi23', description: 'G00 - Gross value of claim' },
-  { key: 'delinked', description: 'G00 - Gross value of claim' },
-  { key: 'sfiExpanded', description: 'G00 - Gross value of claim' },
-  { key: 'sitiCohtr', description: 'G00 - Gross value of claim' },
-  { key: 'sitiCohtc', description: 'G00 - Gross value of claim' }
+  { key: 'sfi', description },
+  { key: 'sfiPilot', description },
+  { key: 'lumpSums', description },
+  { key: 'vetVisits', description },
+  { key: 'cs', description },
+  { key: 'sfi23', description },
+  { key: 'delinked', description },
+  { key: 'sfiExpanded', description },
+  { key: 'sitiCohtr', description },
+  { key: 'sitiCohtc', description },
+  { key: 'fptt', description }
 ]
 
 beforeEach(() => {
+  jest.resetAllMocks()
+
   invoiceLine = structuredClone(require('../../../mocks/payment-requests/invoice-line'))
 
   paymentRequests = {
@@ -38,7 +46,8 @@ beforeEach(() => {
     delinked: structuredClone(require('../../../mocks/payment-requests/delinked')),
     sfiExpanded: structuredClone(require('../../../mocks/payment-requests/sfi-expanded')),
     sitiCohtc: structuredClone(require('../../../mocks/payment-requests/siti-cohtc')),
-    sitiCohtr: structuredClone(require('../../../mocks/payment-requests/siti-cohtr'))
+    sitiCohtr: structuredClone(require('../../../mocks/payment-requests/siti-cohtr')),
+    fptt: structuredClone(require('../../../mocks/payment-requests/fptt'))
   }
 
   lineId = ''
@@ -78,7 +87,6 @@ describe('get ledger line for AP', () => {
     if (key === 'paymentRequest') {
       delete invoiceLine.agreementNumber
     }
-
     const result = getLedgerLineAP(invoiceLine, paymentRequests.cs, lineId, source)
     expect(result[index]).toBe(paymentRequests.cs.agreementNumber)
   })
@@ -90,7 +98,6 @@ describe('get ledger line for AP', () => {
     if (key === 'paymentRequest') {
       delete invoiceLine.agreementNumber
     }
-
     const result = getLedgerLineAR(invoiceLine, paymentRequests.cs, lineId, source)
     expect(result[index]).toBe(paymentRequests.cs.agreementNumber)
   })
@@ -125,5 +132,19 @@ describe('get ledger line for AR', () => {
     delete paymentRequests.sfi.originalSettlementDate
     const result = getLedgerLineAR(invoiceLine, paymentRequests.sfi, lineId, source)
     expect(result[5]).toBe(paymentRequests.sfi.dueDate)
+  })
+
+  describe('value multiplier effect on value', () => {
+    test('should multiply invoice line value by 1 when valueMultiplier is 1', () => {
+      getValueMultiplier.mockReturnValue(1)
+      const result = getLedgerLineAR(invoiceLine, paymentRequests.sfi, lineId, source)
+      expect(result[3]).toBe(convertToPounds(invoiceLine.value))
+    })
+
+    test('should multiply invoice line value by -1 when valueMultiplier is -1', () => {
+      getValueMultiplier.mockReturnValue(-1)
+      const result = getLedgerLineAR(invoiceLine, paymentRequests.sfi, lineId, source)
+      expect(result[3]).toBe(convertToPounds(invoiceLine.value * -1))
+    })
   })
 })

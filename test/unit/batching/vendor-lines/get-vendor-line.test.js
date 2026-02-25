@@ -2,6 +2,10 @@ const { EUR } = require('../../../../app/constants/currency')
 const { AR } = require('../../../../app/constants/ledgers')
 const { NOT_APPLICABLE } = require('../../../../app/constants/not-applicable')
 const { getVendorLineAP, getVendorLineAR } = require('../../../../app/batching/vendor-lines/get-vendor-line')
+const { getValueMultiplier } = require('../../../../app/batching/get-value-multiplier')
+const { convertToPounds } = require('../../../../app/currency-convert')
+
+jest.mock('../../../../app/batching/get-value-multiplier')
 
 let paymentRequest
 let bpsPaymentRequest
@@ -100,5 +104,19 @@ describe('get AR vendor line', () => {
     paymentRequest.marketingYear = null
     const line2 = getVendorLineAR(paymentRequest, batch, lowestValueLine)
     expect(line2[19]).toBe(NOT_APPLICABLE)
+  })
+
+  describe('value multiplier effect on value', () => {
+    test('should multiply invoice line value by 1 when valueMultiplier is 1', () => {
+      getValueMultiplier.mockReturnValue(1)
+      const line = getVendorLineAP(paymentRequest, batch, lowestValueLine)
+      expect(line[8]).toBe(convertToPounds(paymentRequest.value))
+    })
+
+    test('should multiply invoice line value by -1 when valueMultiplier is -1', () => {
+      getValueMultiplier.mockReturnValue(-1)
+      const line = getVendorLineAP(paymentRequest, batch, lowestValueLine)
+      expect(line[8]).toBe(convertToPounds(paymentRequest.value * -1))
+    })
   })
 })

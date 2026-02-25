@@ -11,10 +11,12 @@ const { getDueDate } = require('./get-due-date')
 const { getCurrency } = require('./get-currency')
 const { getSchedule } = require('./get-schedule')
 const { getLegacyIdentifier } = require('./get-legacy-identifier')
+const { getValueMultiplier } = require('../get-value-multiplier')
 const AGREEMENT_NUMBER_INDEX = 28
 
 const getVendorLineAP = (paymentRequest, batch, highestValueLine, hasDifferentFundCodes) => {
   const schedule = getSchedule(paymentRequest.schedule, paymentRequest.pillar)
+  const valueMultiplier = getValueMultiplier(paymentRequest.schemeId)
   const line = [
     'Vendor',
     paymentRequest.frn,
@@ -24,7 +26,7 @@ const getVendorLineAP = (paymentRequest, batch, highestValueLine, hasDifferentFu
     paymentRequest.marketingYear ?? NOT_APPLICABLE,
     paymentRequest.deliveryBody,
     paymentRequest.invoiceNumber,
-    convertToPounds((paymentRequest.value * -1)),
+    convertToPounds((paymentRequest.value * valueMultiplier)),
     paymentRequest.currency,
     getCustomerReference(paymentRequest),
     '',
