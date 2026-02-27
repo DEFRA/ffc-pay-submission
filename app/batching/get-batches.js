@@ -21,8 +21,7 @@ const getPendingBatches = async (started, transaction) => {
   // Get one batch ID per scheme
   const batchIdRows = await db.sequelize.query(getBatchQuery, {
     replacements: {
-      delay: moment(started).subtract(5, 'minutes').toDate(),
-      batchCap: config.batchCap
+      delay: moment(started).subtract(5, 'minutes').toDate()
     },
     transaction,
     type: db.Sequelize.QueryTypes.SELECT
