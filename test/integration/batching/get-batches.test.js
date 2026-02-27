@@ -1,6 +1,5 @@
 const db = require('../../../app/data')
 const getBatches = require('../../../app/batching/get-batches')
-const config = require('../../../app/config')
 const { AP } = require('../../../app/constants/ledgers')
 
 let scheme
@@ -108,7 +107,6 @@ describe('get batches', () => {
       LOCK: { UPDATE: 'UPDATE' }
     }
 
-    // Force error
     const originalQuery = db.sequelize.query
     db.sequelize.query = jest.fn(() => { throw new Error('boom') })
 
@@ -130,13 +128,11 @@ describe('get batches', () => {
     await db.paymentRequest.create(paymentRequest)
     await db.invoiceLine.create(invoiceLine)
 
-    // Mock internal function to force an error
     const original = db.sequelize.query
     db.sequelize.query = jest.fn(() => { throw new Error('forced failure') })
 
     await expect(runGetBatches()).rejects.toThrow('forced failure')
 
-    // Restore original
     db.sequelize.query = original
   })
 })

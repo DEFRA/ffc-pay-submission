@@ -1,6 +1,5 @@
 const db = require('../data')
 const moment = require('moment')
-const config = require('../config')
 const getBatchQuery = require('../constants/get-batch-query')
 
 const getBatches = async (transaction, started = new Date()) => {
