@@ -46,32 +46,32 @@ extends:
     sndDeployment: ${{ parameters.sndDeployment }}
     variableGroupName: ffc-pay-submission-env-var
     pr_params:
-      container.processingActive: ${{ eq(variables['pr_processingActive'], 'true') }}
+      container.processingActive: $(pr_processingActive)
       container.batchGenerationInterval: $(pr_batchGenerationInterval)
       container.batchSize: $(pr_batchSize)
       container.batchCap: $(pr_batchCap)
     snd2_params:
-      container.processingActive: ${{ eq(variables['snd2_processingActive'], 'true') }}
+      container.processingActive: $(snd2_processingActive)
       container.batchGenerationInterval: $(snd2_batchGenerationInterval)
       container.batchSize: $(snd2_batchSize)
       container.batchCap: $(snd2_batchCap)
     dev_params:
-      container.processingActive: ${{ eq(variables['dev_processingActive'], 'true') }}
+      container.processingActive: $(dev_processingActive)
       container.batchGenerationInterval: $(dev_batchGenerationInterval)
       container.batchSize: $(dev_batchSize)
       container.batchCap: $(dev_batchCap)
     test_params:
-      container.processingActive: ${{ eq(variables['test_processingActive'], 'true') }}
+      container.processingActive: $(test_processingActive)
       container.batchGenerationInterval: $(test_batchGenerationInterval)
       container.batchSize: $(test_batchSize)
       container.batchCap: $(test_batchCap)
     pre_params:
-      container.processingActive: ${{ eq(variables['pre_processingActive'], 'true') }}
+      container.processingActive: $(pre_processingActive)
       container.batchGenerationInterval: $(pre_batchGenerationInterval)
       container.batchSize: $(pre_batchSize)
       container.batchCap: $(pre_batchCap)
     prd_params:
-      container.processingActive: ${{ eq(variables['prd_processingActive'], 'true') }}
+      container.processingActive: $(prd_processingActive)
       container.batchGenerationInterval: $(prd_batchGenerationInterval)
       container.batchSize: $(prd_batchSize)
       container.batchCap: $(prd_batchCap)
