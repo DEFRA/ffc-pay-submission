@@ -9,8 +9,7 @@ const schema = Joi.object({
   processingActive: Joi.boolean().default(true),
   env: Joi.string().valid('development', 'test', 'production').default('development'),
   batchGenerationInterval: Joi.number().default(1800000), // 30 minutes
-  batchSize: Joi.number().default(2000),
-  batchCap: Joi.number().default(1)
+  batchSize: Joi.number().default(2000)
 })
 
 // Build config
@@ -18,8 +17,7 @@ const config = {
   processingActive: process.env.PROCESSING_ACTIVE,
   env: process.env.NODE_ENV,
   batchGenerationInterval: process.env.BATCH_INTERVAL,
-  batchSize: process.env.BATCH_SIZE,
-  batchCap: process.env.BATCH_CAP
+  batchSize: process.env.BATCH_SIZE
 }
 
 // Validate config

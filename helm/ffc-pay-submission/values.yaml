@@ -44,7 +44,6 @@ container:
   storageFolder: outbound
   batchGenerationInterval: 1800000
   batchSize: 2000
-  batchCap: 1
   processingActive: true
 
 readinessProbe:

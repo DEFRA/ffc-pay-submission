@@ -28,5 +28,4 @@ data:
   AZURE_STORAGE_FOLDER: {{ quote .Values.container.storageFolder }}
   BATCH_INTERVAL: {{ quote .Values.container.batchGenerationInterval }}
   BATCH_SIZE: {{ quote .Values.container.batchSize }}
-  BATCH_CAP: {{ quote .Values.container.batchCap }}
 {{- end -}}
