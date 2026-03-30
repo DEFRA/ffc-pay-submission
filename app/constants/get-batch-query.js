@@ -15,6 +15,5 @@ const getBatchQuery = `
         AND ("batches"."started" IS NULL OR "batches"."started" <= :delay)
     ) t
     WHERE rn = 1
-    LIMIT :batchCap
   `
 module.exports = getBatchQuery

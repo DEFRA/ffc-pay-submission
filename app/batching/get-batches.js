@@ -1,6 +1,5 @@
 const db = require('../data')
 const moment = require('moment')
-const config = require('../config')
 const getBatchQuery = require('../constants/get-batch-query')
 
 const getBatches = async (transaction, started = new Date()) => {
@@ -18,11 +17,11 @@ const getBatches = async (transaction, started = new Date()) => {
 }
 
 const getPendingBatches = async (started, transaction) => {
+  const batchProcessingDelayMinutes = 5
   // Get one batch ID per scheme
   const batchIdRows = await db.sequelize.query(getBatchQuery, {
     replacements: {
-      delay: moment(started).subtract(5, 'minutes').toDate(),
-      batchCap: config.batchCap
+      delay: moment(started).subtract(batchProcessingDelayMinutes, 'minutes').toDate()
     },
     transaction,
     type: db.Sequelize.QueryTypes.SELECT

@@ -1,6 +1,5 @@
 const db = require('../../../app/data')
 const getBatches = require('../../../app/batching/get-batches')
-const config = require('../../../app/config')
 const { AP } = require('../../../app/constants/ledgers')
 
 let scheme
@@ -97,26 +96,6 @@ describe('get batches', () => {
     expect(batchResult.started).not.toBeNull()
   })
 
-  test('should restrict batches to cap', async () => {
-    const originalCap = config.batchCap
-    config.batchCap = 1
-
-    await db.scheme.create(scheme)
-    await db.batchProperties.create(batchProperties)
-    await db.batch.create(batch)
-    await db.paymentRequest.create(paymentRequest)
-    await db.invoiceLine.create(invoiceLine)
-
-    await db.batch.create({ ...batch, batchId: 2, sequence: 2 })
-    await db.paymentRequest.create({ ...paymentRequest, paymentRequestId: 2, batchId: 2 })
-    await db.invoiceLine.create({ ...invoiceLine, invoiceLineId: 2, paymentRequestId: 2 })
-
-    const batches = await runGetBatches()
-    expect(batches.length).toBe(1)
-
-    config.batchCap = originalCap
-  })
-
   test('should throw if called without a transaction', async () => {
     await expect(getBatches()).rejects.toThrow('getBatches must be called with a transaction')
   })
@@ -128,7 +107,6 @@ describe('get batches', () => {
       LOCK: { UPDATE: 'UPDATE' }
     }
 
-    // Force error
     const originalQuery = db.sequelize.query
     db.sequelize.query = jest.fn(() => { throw new Error('boom') })
 
@@ -150,13 +128,11 @@ describe('get batches', () => {
     await db.paymentRequest.create(paymentRequest)
     await db.invoiceLine.create(invoiceLine)
 
-    // Mock internal function to force an error
     const original = db.sequelize.query
     db.sequelize.query = jest.fn(() => { throw new Error('forced failure') })
 
     await expect(runGetBatches()).rejects.toThrow('forced failure')
 
-    // Restore original
     db.sequelize.query = original
   })
 })

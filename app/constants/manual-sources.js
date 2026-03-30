@@ -33,7 +33,8 @@ const {
   DP,
   ESFIO,
   COHTC,
-  COHTR
+  COHTR,
+  FPTT
 } = require('./pillars')
 
 module.exports = {
@@ -71,5 +72,6 @@ module.exports = {
   [DP]: 'PMAN_DP',
   [ESFIO]: 'PMAN_ESFIO',
   [COHTC]: 'PMAN_COHTC',
-  [COHTR]: 'PMAN_COHTR'
+  [COHTR]: 'PMAN_COHTR',
+  [FPTT]: 'PMAN_FPTT'
 }
