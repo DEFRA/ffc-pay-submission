@@ -1,6 +1,6 @@
 const {
   BPS, CS, LumpSums, SFI, SFIP, VetVisits, IMPS, ES,
-  SFI23, Delinked, SFIExpanded, SITICOHTC, SITICOHTR
+  SFI23, Delinked, SFIExpanded, SITICOHTC, SITICOHTR, FPTT
 } = require('../../../../app/constants/schemes')
 const { getPaymentType } = require('../../../../app/batching/vendor-lines/get-payment-type')
 
@@ -25,7 +25,8 @@ describe('get payment type', () => {
     { scheme: Delinked, paymentType: '0', expected: 0 },
     { scheme: SFIExpanded, paymentType: '0', expected: 0 },
     { scheme: SITICOHTR, paymentType: '0', expected: 0 },
-    { scheme: SITICOHTC, paymentType: '0', expected: 0 }
+    { scheme: SITICOHTC, paymentType: '0', expected: 0 },
+    { scheme: FPTT, paymentType: '0', expected: 0 }
   ])('returns $expected for $scheme with paymentType $paymentType', ({ scheme, paymentType, expected }) => {
     expect(getPaymentType(scheme, paymentType)).toBe(expected)
   })
