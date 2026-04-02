@@ -7,7 +7,7 @@ container:
   paymentSubmitSubscriptionAddress: ffc-pay-submission
   fileSendTopicAddress: ffc-pay-file-send
   eventsTopicAddress: ffc-pay-events
-  azureStorageAccountName: snd2ffcpayst2001
+  azureStorageAccountName: sndffcpayst1001
   azureStorageConnectionString: dummy
   azureStorageUseConnectionString: false
   azureStorageCreateContainers: false
@@ -18,7 +18,7 @@ container:
   azure:
     keyvaultName: SNDFFCINFKV1001
     objects:
-      - objectName:
+      - objectName: appInsights-connectionString
         objectType: secret
 
   secretObjects:
