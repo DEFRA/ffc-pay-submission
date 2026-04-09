@@ -5,5 +5,6 @@ const paymentRequest = require('./payment-request')
 module.exports = {
   ...paymentRequest,
   schemeId: FPTT,
-  invoiceNumber: FPTT_INVOICE_NUMBER
+  invoiceNumber: FPTT_INVOICE_NUMBER,
+  fesCode: 'FALS_FPTT'
 }

@@ -72,6 +72,22 @@ describe('get AP vendor line', () => {
     const line2 = getVendorLineAP(paymentRequest, batch, highestValueLine, hasDifferentFundCodes)
     expect(line2[5]).toBe(NOT_APPLICABLE)
   })
+
+  test('should use fesCode from paymentRequest as source when present', () => {
+    paymentRequest.fesCode = 'FES123'
+    batch.scheme.batchProperties.source = 'SFI'
+    const line = getVendorLineAP(paymentRequest, batch, highestValueLine, hasDifferentFundCodes)
+    expect(line[20]).toBeDefined()
+    expect(line[20]).toContain('FES123')
+  })
+
+  test('should use batch.scheme.batchProperties.source as source when fesCode is missing', () => {
+    delete paymentRequest.fesCode
+    batch.scheme.batchProperties.source = 'SFI'
+    const line = getVendorLineAP(paymentRequest, batch, highestValueLine, hasDifferentFundCodes)
+    expect(line[20]).toBeDefined()
+    expect(line[20]).toContain('SFI')
+  })
 })
 
 describe('get AR vendor line', () => {
@@ -104,6 +120,22 @@ describe('get AR vendor line', () => {
     paymentRequest.marketingYear = null
     const line2 = getVendorLineAR(paymentRequest, batch, lowestValueLine)
     expect(line2[19]).toBe(NOT_APPLICABLE)
+  })
+
+  test('should use fesCode from paymentRequest as source when present', () => {
+    paymentRequest.fesCode = 'FES123'
+    batch.scheme.batchProperties.source = 'SFI'
+    const line = getVendorLineAR(paymentRequest, batch, lowestValueLine)
+    expect(line[8]).toBeDefined()
+    expect(line[8]).toContain('FES123')
+  })
+
+  test('should use batch.scheme.batchProperties.source as source when fesCode is missing', () => {
+    delete paymentRequest.fesCode
+    batch.scheme.batchProperties.source = 'SFI'
+    const line = getVendorLineAR(paymentRequest, batch, lowestValueLine)
+    expect(line[8]).toBeDefined()
+    expect(line[8]).toContain('SFI')
   })
 
   describe('value multiplier effect on value', () => {
