@@ -14,7 +14,7 @@
     <sql>
       UPDATE "invoiceLines"
       SET "description" = REPLACE("description", 'â‚¬', 'EUR')
-      WHERE "description" LIKE '%€%';
+      WHERE "description" LIKE '%â‚¬%';
     </sql>
   </changeSet>
 </databaseChangeLog>
