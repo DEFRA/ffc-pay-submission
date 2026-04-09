@@ -17,6 +17,7 @@ const AGREEMENT_NUMBER_INDEX = 28
 const getVendorLineAP = (paymentRequest, batch, highestValueLine, hasDifferentFundCodes) => {
   const schedule = getSchedule(paymentRequest.schedule, paymentRequest.pillar)
   const valueMultiplier = getValueMultiplier(paymentRequest.schemeId)
+  const source = paymentRequest.fesCode ?? batch.scheme.batchProperties.source
   const line = [
     'Vendor',
     paymentRequest.frn,
@@ -38,7 +39,7 @@ const getVendorLineAP = (paymentRequest, batch, highestValueLine, hasDifferentFu
     getHeaderDescription(paymentRequest),
     '',
     `BACS_${paymentRequest.currency}`,
-    getSource(paymentRequest.schemeId, batch.scheme.batchProperties.source, paymentRequest.pillar),
+    getSource(paymentRequest.schemeId, source, paymentRequest.pillar),
     paymentRequest.exchangeRate ?? '',
     getBatchNumber(paymentRequest.schemeId, batch.sequence, paymentRequest.batch),
     paymentRequest.eventDate ?? '',
@@ -58,6 +59,7 @@ const getVendorLineAP = (paymentRequest, batch, highestValueLine, hasDifferentFu
 }
 
 const getVendorLineAR = (paymentRequest, batch, lowestValueLine) => {
+  const source = paymentRequest.fesCode ?? batch.scheme.batchProperties.source
   return [
     'H',
     paymentRequest.frn,
@@ -67,7 +69,7 @@ const getVendorLineAR = (paymentRequest, batch, lowestValueLine) => {
     paymentRequest.originalInvoiceNumber,
     'None',
     '',
-    getSource(paymentRequest.schemeId, batch.scheme.batchProperties.source, paymentRequest.pillar),
+    getSource(paymentRequest.schemeId, source, paymentRequest.pillar),
     '',
     paymentRequest.invoiceNumber,
     paymentRequest.invoiceNumber,
