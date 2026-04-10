@@ -22,6 +22,7 @@ describe('get filename', () => {
         }
       }
     }
+    pillar = undefined
   })
 
   afterAll(async () => {
@@ -40,7 +41,7 @@ describe('get filename', () => {
     expect(filename).toMatch(/PFELM_0010_AP_\d{14} \(SITI\).csv/)
   })
 
-  test('should return filename for AR', async () => {
+  test('should return filename for AR ledger', async () => {
     batch.ledger = AR
     const filename = getFilename(batch, pillar)
     expect(filename).toMatch(/PFELM_0001_AR_\d{14} \(SITI\).csv/)
@@ -61,5 +62,11 @@ describe('get filename', () => {
     batch.scheme.schemeId = MANUAL
     const filename = getFilename(batch, pillar)
     expect(filename).toMatch(/FFCPMAN_SFI_0001_AP_\d{14} \(PMAN_SFI\).csv/)
+  })
+
+  test('should return filename with fesCode when fesCode is provided', async () => {
+    const fesCode = 'FESC'
+    const filename = getFilename(batch, pillar, fesCode)
+    expect(filename).toMatch(/FFCFESC_0001_AP_\d{14} \(FESC\).csv/)
   })
 })

@@ -33,5 +33,6 @@ module.exports = {
   DP: 'DP',
   ESFIO: 'ESFIO',
   COHTC: 'COHTC',
-  COHTR: 'COHTR'
+  COHTR: 'COHTR',
+  FPTT: 'FPTT'
 }

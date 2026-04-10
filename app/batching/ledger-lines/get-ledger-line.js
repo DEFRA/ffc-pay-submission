@@ -4,6 +4,7 @@ const { getCustomerReference } = require('../get-customer-reference')
 const { getLineId } = require('./get-line-id')
 const { getDescription } = require('./get-description')
 const { getAgreementReference } = require('../get-agreement-reference')
+const { getValueMultiplier } = require('../get-value-multiplier')
 const AGREEMENT_NUMBER_INDEX = 28
 
 const getLedgerLineAP = (invoiceLine, paymentRequest, lineId, source) => {
@@ -48,11 +49,12 @@ const getLedgerLineAP = (invoiceLine, paymentRequest, lineId, source) => {
 }
 
 const getLedgerLineAR = (invoiceLine, paymentRequest, lineId, source) => {
+  const valueMultiplier = getValueMultiplier(paymentRequest.schemeId)
   return [
     'L',
     getDescription(paymentRequest.schemeId, invoiceLine.description),
     invoiceLine.accountCode,
-    convertToPounds((invoiceLine.value * -1)),
+    convertToPounds((invoiceLine.value * valueMultiplier)),
     '',
     paymentRequest.originalSettlementDate ?? paymentRequest.dueDate,
     paymentRequest.recoveryDate,
