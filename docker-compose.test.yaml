@@ -46,7 +46,7 @@ services:
 
   ffc-pay-submission-servicebus-emulator:
     container_name: "ffc-pay-submission-servicebus-emulator"
-    image: mcr.microsoft.com/azure-messaging/ffc-pay-submission-servicebus-emulator:latest
+    image: mcr.microsoft.com/azure-messaging/servicebus-emulator:latest
     pull_policy: always
     volumes:
       - "./BusConfig.json:/ServiceBus_Emulator/ConfigFiles/Config.json"
