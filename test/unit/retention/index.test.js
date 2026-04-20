@@ -32,7 +32,8 @@ describe('removeAgreementData', () => {
   const retentionData = {
     agreementNumber: 'AGR123',
     frn: 456789,
-    schemeId: 10
+    schemeId: 10,
+    usesContractNumber: false
   }
   let transaction
 
@@ -58,6 +59,7 @@ describe('removeAgreementData', () => {
       retentionData.agreementNumber,
       retentionData.frn,
       retentionData.schemeId,
+      retentionData.usesContractNumber,
       transaction
     )
     expect(consoleInfoSpy).toHaveBeenCalledWith('No agreement data to remove')
@@ -89,6 +91,7 @@ describe('removeAgreementData', () => {
       retentionData.agreementNumber,
       retentionData.frn,
       retentionData.schemeId,
+      retentionData.usesContractNumber,
       transaction
     )
     expect(removeQueues).toHaveBeenCalledWith(paymentRequestIds, transaction)
