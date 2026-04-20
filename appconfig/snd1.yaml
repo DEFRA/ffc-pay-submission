@@ -14,7 +14,7 @@ container:
   storageContainer: dax
   storageFolder: outbound
 
-  secretProviderClass:
+secretProviderClass:
   azure:
     keyvaultName: SNDFFCINFKV1001
     objects:
