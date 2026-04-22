@@ -2,6 +2,11 @@ const { removeQueues } = require('../../../app/retention/remove-queues')
 const db = require('../../../app/data')
 
 jest.mock('../../../app/data', () => ({
+  Sequelize: {
+    Op: {
+      in: 'IN_OPERATOR'
+    }
+  },
   queue: {
     destroy: jest.fn()
   }
@@ -20,7 +25,9 @@ describe('removeQueues', () => {
 
     expect(db.queue.destroy).toHaveBeenCalledTimes(1)
     expect(db.queue.destroy).toHaveBeenCalledWith({
-      where: { paymentRequestId: paymentRequestIds },
+      where: {
+        paymentRequestId: { [db.Sequelize.Op.in]: paymentRequestIds }
+      },
       transaction
     })
   })
@@ -29,7 +36,9 @@ describe('removeQueues', () => {
     await removeQueues(paymentRequestIds)
 
     expect(db.queue.destroy).toHaveBeenCalledWith({
-      where: { paymentRequestId: paymentRequestIds },
+      where: {
+        paymentRequestId: { [db.Sequelize.Op.in]: paymentRequestIds }
+      },
       transaction: undefined
     })
   })
