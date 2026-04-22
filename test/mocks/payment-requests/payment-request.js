@@ -39,6 +39,7 @@ module.exports = {
   dueDate: DUE_DATE_DAX,
   value: 150.00,
   ledger: AP,
+  providesAccountingValues: false,
   invoiceLines: [{
     ...invoiceLine,
     value: 250.00
