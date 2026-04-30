@@ -7,14 +7,17 @@ data:
   PROCESSING_ACTIVE: {{ quote .Values.container.processingActive }}
   {{- if (.Values.environmentCode) }}
   PAYMENTSUBMIT_TOPIC_ADDRESS: {{ .Values.container.paymentSubmitTopicAddress }}-{{ .Values.environmentCode }}
+  RETENTION_TOPIC_ADDRESS: {{ .Values.container.retentionTopicAddress }}-{{ .Values.environmentCode }}
   EVENTS_TOPIC_ADDRESS: {{ .Values.container.eventsTopicAddress }}-{{ .Values.environmentCode }}
   FILESEND_TOPIC_ADDRESS: {{ .Values.container.fileSendTopicAddress }}-{{ .Values.environmentCode }}
   {{ else }}
   PAYMENTSUBMIT_TOPIC_ADDRESS: {{ quote .Values.container.paymentSubmitTopicAddress }}
+  RETENTION_TOPIC_ADDRESS: {{ quote .Values.container.retentionTopicAddress }}
   EVENTS_TOPIC_ADDRESS: {{ quote .Values.container.eventsTopicAddress }}
   FILESEND_TOPIC_ADDRESS: {{ quote .Values.container.fileSendTopicAddress }}
   {{- end }}
   PAYMENTSUBMIT_SUBSCRIPTION_ADDRESS: {{ quote .Values.container.paymentSubmitSubscriptionAddress }}
+  RETENTION_SUBSCRIPTION_ADDRESS: {{ quote .Values.container.retentionSubscriptionAddress }}
   POSTGRES_DB: {{ quote .Values.postgresService.postgresDb }}
   POSTGRES_HOST: {{ quote .Values.postgresService.postgresqlHost }}
   POSTGRES_PORT: {{ quote .Values.postgresService.postgresPort }}

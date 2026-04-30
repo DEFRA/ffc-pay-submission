@@ -15,6 +15,11 @@ const mqSchema = Joi.object({
     topic: Joi.string(),
     numberOfReceivers: Joi.number().default(1)
   },
+  retentionSubscription: {
+    address: Joi.string().required(),
+    topic: Joi.string().required(),
+    type: Joi.string().default('subscription')
+  },
   sendTopic: {
     address: Joi.string()
   },
@@ -37,6 +42,10 @@ const mqConfig = {
     topic: process.env.PAYMENTSUBMIT_TOPIC_ADDRESS,
     numberOfReceivers: process.env.PAYMENTSUBMIT_SUBSCRIPTION_RECEIVERS
   },
+  retentionSubscription: {
+    address: process.env.RETENTION_SUBSCRIPTION_ADDRESS,
+    topic: process.env.RETENTION_TOPIC_ADDRESS
+  },
   sendTopic: {
     address: process.env.FILESEND_TOPIC_ADDRESS
   },
@@ -55,11 +64,13 @@ if (mqResult.error) {
 }
 
 const submitSubscription = { ...mqResult.value.messageQueue, ...mqResult.value.submitSubscription }
+const retentionSubscription = { ...mqResult.value.messageQueue, ...mqResult.value.retentionSubscription }
 const sendTopic = { ...mqResult.value.messageQueue, ...mqResult.value.sendTopic }
 const eventsTopic = { ...mqResult.value.messageQueue, ...mqResult.value.eventsTopic }
 
 module.exports = {
   submitSubscription,
+  retentionSubscription,
   sendTopic,
   eventsTopic
 }
