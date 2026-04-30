@@ -1,4 +1,4 @@
-const { v4: uuidv4 } = require('uuid')
+const { randomUUID } = require('node:crypto')
 const db = require('../../../app/data')
 const savePaymentRequest = require('../../../app/inbound')
 
@@ -100,7 +100,7 @@ describe('save payment requests', () => {
   })
 
   test('should save referenceId if provided', async () => {
-    paymentRequest.referenceId = uuidv4()
+    paymentRequest.referenceId = randomUUID()
     await savePaymentRequest(paymentRequest)
     const rows = await db.paymentRequest.findAll({ where: { referenceId: paymentRequest.referenceId } })
     expect(rows).toHaveLength(1)
@@ -114,7 +114,7 @@ describe('save payment requests', () => {
 
   test.each([
     { desc: 'duplicate invoice number', modify: () => {}, expected: 1 },
-    { desc: 'second payment request with referenceId', modify: () => { paymentRequest.referenceId = uuidv4() }, expected: 2 }
+    { desc: 'second payment request with referenceId', modify: () => { paymentRequest.referenceId = randomUUID() }, expected: 2 }
   ])('should handle $desc correctly', async ({ modify, expected }) => {
     await savePaymentRequest(paymentRequest)
     modify()
