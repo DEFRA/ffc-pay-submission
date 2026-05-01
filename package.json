@@ -27,7 +27,7 @@
   ],
   "license": "OGL-UK-3.0",
   "dependencies": {
-    "@azure/identity": "4.4.1",
+    "@azure/identity": "4.13.1",
     "@azure/monitor-opentelemetry": "1.16.0",
     "@azure/storage-blob": "12.31.0",
     "@fast-csv/format": "5.0.5",
@@ -39,8 +39,7 @@
     "joi": "17.6.0",
     "log-timestamp": "0.3.0",
     "moment": "2.29.4",
-    "sequelize": "6.37.8",
-    "uuid": "8.3.2"
+    "sequelize": "6.37.8"
   },
   "devDependencies": {
     "blipp": "4.0.2",
