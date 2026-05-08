@@ -1,6 +1,6 @@
 {
   "name": "ffc-pay-submission",
-  "version": "1.27.38",
+  "version": "1.27.39",
   "description": "FFC payment submission service",
   "homepage": "https://github.com/DEFRA/ffc-pay-submission",
   "main": "app/index.js",
@@ -27,8 +27,8 @@
   ],
   "license": "OGL-UK-3.0",
   "dependencies": {
-    "@azure/identity": "4.13.1",
-    "@azure/storage-blob": "12.29.1",
+    "@azure/identity": "4.4.1",
+    "@azure/storage-blob": "12.31.0",
     "@fast-csv/format": "5.0.5",
     "@hapi/hapi": "21.4.8",
     "applicationinsights": "2.9.6",
