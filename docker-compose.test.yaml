@@ -10,7 +10,7 @@ services:
     depends_on:
       - ffc-pay-submission-postgres
       - ffc-pay-dax-azurite
-      - servicebus-emulator
+      - ffc-pay-submission-servicebus-emulator
     command: npm run test
     volumes:
       - ./app:/home/node/app
@@ -21,7 +21,7 @@ services:
     environment:
       AZURE_STORAGE_CONNECTION_STRING: DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://ffc-pay-dax-azurite:10000/devstoreaccount1;
       PROCESSING_ACTIVE: true
-      MESSAGE_QUEUE_HOST: servicebus-emulator
+      MESSAGE_QUEUE_HOST: ffc-pay-submission-servicebus-emulator
       MESSAGE_QUEUE_USER: RootManageSharedAccessKey
       MESSAGE_QUEUE_PASSWORD: SAS_KEY_VALUE
       PAYMENTSUBMIT_TOPIC_ADDRESS: ffc-pay-submit-test
@@ -37,15 +37,15 @@ services:
     labels:
       com.docker.compose.pay.role: test
 
-  sqledge:
-    container_name: "sqledge"
+  ffc-pay-submission-sqledge:
+    container_name: "ffc-pay-submission-sqledge"
     image: "mcr.microsoft.com/azure-sql-edge:latest"
     environment:
       ACCEPT_EULA: "Y"
       MSSQL_SA_PASSWORD: "DummyStrongPa$$w0rd" # To be filled by user as per policy : https://learn.microsoft.com/en-us/sql/relational-databases/security/strong-passwords?view=sql-server-linux-ver16
 
-  servicebus-emulator:
-    container_name: "servicebus-emulator"
+  ffc-pay-submission-servicebus-emulator:
+    container_name: "ffc-pay-submission-servicebus-emulator"
     image: mcr.microsoft.com/azure-messaging/servicebus-emulator:latest
     pull_policy: always
     volumes:
@@ -53,11 +53,11 @@ services:
     ports:
       - "5672:5672"
     environment:
-      SQL_SERVER: sqledge
+      SQL_SERVER: ffc-pay-submission-sqledge
       MSSQL_SA_PASSWORD: "DummyStrongPa$$w0rd" # Password should be same as what is set for SQL Edge
       ACCEPT_EULA: "Y"
     depends_on:
-      - sqledge
+      - ffc-pay-submission-sqledge
 
     healthcheck:
       test: ["CMD-SHELL", "nc -z localhost 5672"]
