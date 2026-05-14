@@ -49,7 +49,7 @@ const getLedgerLineAP = (invoiceLine, paymentRequest, lineId, source) => {
 }
 
 const getLedgerLineAR = (invoiceLine, paymentRequest, lineId, source) => {
-  const valueMultiplier = getValueMultiplier(paymentRequest.schemeId)
+  const valueMultiplier = getValueMultiplier(paymentRequest.providesAccountingValues)
   return [
     'L',
     getDescription(paymentRequest.schemeId, invoiceLine.description),

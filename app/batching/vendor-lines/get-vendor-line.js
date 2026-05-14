@@ -16,7 +16,7 @@ const AGREEMENT_NUMBER_INDEX = 28
 
 const getVendorLineAP = (paymentRequest, batch, highestValueLine, hasDifferentFundCodes) => {
   const schedule = getSchedule(paymentRequest.schedule, paymentRequest.pillar)
-  const valueMultiplier = getValueMultiplier(paymentRequest.schemeId)
+  const valueMultiplier = getValueMultiplier(paymentRequest.providesAccountingValues)
   const source = paymentRequest.fesCode ?? batch.scheme.batchProperties.source
   const line = [
     'Vendor',
