@@ -20,7 +20,7 @@ containerSecret:
 
 deployment:
   minReplicas: 1
-  maxReplicas: 3
+  maxReplicas: 1
   cpuThreshold: 80
   memoryThreshold: 80
   priorityClassName: high

@@ -1,29 +1,23 @@
 const { getValueMultiplier } = require('../../../app/batching/get-value-multiplier')
-const { FPTT } = require('../../../app/constants/schemes')
 
 describe('getValueMultiplier', () => {
-  test('should return 1 when schemeId is FPTT', () => {
-    const result = getValueMultiplier(FPTT)
+  test('should return 1 when providesAccountingValues is true', () => {
+    const result = getValueMultiplier(true)
     expect(result).toBe(1)
   })
 
-  test('should return -1 when schemeId is not FPTT', () => {
-    const result = getValueMultiplier('someOtherScheme')
+  test('should return -1 when providesAccountingValues is false', () => {
+    const result = getValueMultiplier(false)
     expect(result).toBe(-1)
   })
 
-  test('should return -1 when schemeId is undefined', () => {
+  test('should return -1 when providesAccountingValues is undefined', () => {
     const result = getValueMultiplier(undefined)
     expect(result).toBe(-1)
   })
 
-  test('should return -1 when schemeId is null', () => {
+  test('should return -1 when providesAccountingValues is null', () => {
     const result = getValueMultiplier(null)
-    expect(result).toBe(-1)
-  })
-
-  test('should return -1 when schemeId is an empty string', () => {
-    const result = getValueMultiplier('')
     expect(result).toBe(-1)
   })
 })
