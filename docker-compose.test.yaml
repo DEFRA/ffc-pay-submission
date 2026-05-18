@@ -26,6 +26,8 @@ services:
       MESSAGE_QUEUE_PASSWORD: SAS_KEY_VALUE
       PAYMENTSUBMIT_TOPIC_ADDRESS: ffc-pay-submit-test
       PAYMENTSUBMIT_SUBSCRIPTION_ADDRESS: ffc-pay-submission
+      RETENTION_TOPIC_ADDRESS: fcp-pds-data-retention
+      RETENTION_SUBSCRIPTION_ADDRESS: ffc-pay-submission
       EVENTS_TOPIC_ADDRESS: ffc-pay-events-test
       FILESEND_TOPIC_ADDRESS: ffc-pay-file-send-test
 
