@@ -7,4 +7,9 @@ ignore:
         reason: No current fix available
         expires: 2025-07-29T12:35:06.796Z
         created: 2025-07-22T06:35:06.803Z
+  SNYK-JS-UUID-16133035:  
+    - '*':
+        reason: Temporary ignore for transitive dependency via sequelize until dependency upgrade path is available
+        expires: 2026-06-11T00:00:00.000Z
+        created: 2026-05-14T00:00:00.000Z
 patch: {}
