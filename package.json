@@ -28,13 +28,13 @@
   "license": "OGL-UK-3.0",
   "dependencies": {
     "@azure/identity": "4.13.1",
-    "@azure/monitor-opentelemetry": "1.16.0",
+    "@azure/monitor-opentelemetry": "1.18.0",
     "@azure/storage-blob": "12.31.0",
     "@fast-csv/format": "5.0.5",
     "@hapi/hapi": "21.4.8",
     "ffc-database": "1.0.24",
     "ffc-messaging": "2.10.5",
-    "ffc-pay-event-publisher": "1.2.3",
+    "ffc-pay-event-publisher": "1.2.5",
     "hapi-pino": "13.0.0",
     "joi": "17.6.0",
     "log-timestamp": "0.3.0",
@@ -54,5 +54,9 @@
     "ignore": [
       "**/test-output/**"
     ]
+  },
+  "overrides": {
+    "protobufjs": "8.2.0",
+    "uuid": "11.1.1"
   }
 }
