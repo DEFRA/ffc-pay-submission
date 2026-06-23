@@ -32,4 +32,5 @@ data:
   AZURE_STORAGE_FOLDER: {{ quote .Values.container.storageFolder }}
   BATCH_INTERVAL: {{ quote .Values.container.batchGenerationInterval }}
   BATCH_SIZE: {{ quote .Values.container.batchSize }}
+  AZURE_LOG_LEVEL: {{ quote .Values.container.azureLogLevel }}
 {{- end -}}
