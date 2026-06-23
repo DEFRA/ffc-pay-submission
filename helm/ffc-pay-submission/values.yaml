@@ -47,6 +47,7 @@ container:
   batchGenerationInterval: 1800000
   batchSize: 2000
   processingActive: true
+  azureLogLevel: error
 
 readinessProbe:
   path: /healthy
