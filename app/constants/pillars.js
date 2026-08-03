@@ -34,5 +34,6 @@ module.exports = {
   ESFIO: 'ESFIO',
   COHTC: 'COHTC',
   COHTR: 'COHTR',
-  FPTT: 'FPTT'
+  FPTT: 'FPTT',
+  WMP: 'WMP'
 }
