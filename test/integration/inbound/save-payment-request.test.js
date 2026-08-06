@@ -1,4 +1,11 @@
 const { randomUUID } = require('node:crypto')
+
+jest.mock('ffc-pay-event-publisher', () => ({
+  EventPublisher: jest.fn().mockImplementation(() => ({
+    publishEvent: jest.fn()
+  }))
+}))
+
 const db = require('../../../app/data')
 const savePaymentRequest = require('../../../app/inbound')
 
