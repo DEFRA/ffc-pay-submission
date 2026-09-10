@@ -1,0 +1,52 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-3.9.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.9.xsd">
+  <changeSet author="Alistair Wishart" id="1">
+    <tagDatabase tag="v1.41.0" />
+  </changeSet>
+
+  <changeSet author="Alistair Wishart" id="2">
+    <createIndex
+        indexName="idx_invoice_lines_payment_request_id"
+        tableName="invoiceLines">
+        <column name="paymentRequestId"/>
+    </createIndex>
+
+    <createIndex
+        indexName="idx_payment_requests_batch_id"
+        tableName="paymentRequests">
+        <column name="batchId"/>
+    </createIndex>
+
+    <createIndex
+        indexName="idx_payment_requests_scheme_id"
+        tableName="paymentRequests">
+        <column name="schemeId"/>
+    </createIndex>
+
+    <createIndex
+        indexName="idx_queue_batch_id"
+        tableName="queue">
+        <column name="batchId"/>
+    </createIndex>
+
+    <createIndex
+        indexName="idx_queue_payment_request_id"
+        tableName="queue">
+        <column name="paymentRequestId"/>
+    </createIndex>
+
+    <createIndex
+        indexName="idx_queue_batch_payment_request"
+        tableName="queue">
+        <column name="batchId"/>
+        <column name="paymentRequestId"/>
+    </createIndex>
+
+    <createIndex
+        indexName="idx_batches_scheme_sequence"
+        tableName="batches">
+        <column name="schemeId"/>
+        <column name="sequence"/>
+    </createIndex>
+  </changeSet>
+</databaseChangeLog>
