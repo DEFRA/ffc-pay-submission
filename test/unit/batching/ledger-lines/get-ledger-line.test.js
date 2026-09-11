@@ -28,7 +28,8 @@ const schemesFullDescription = [
   { key: 'sitiCohtr', description },
   { key: 'sitiCohtc', description },
   { key: 'fptt', description },
-  { key: 'wmp', description }
+  { key: 'wmp', description },
+  { key: 'sfi26', description }
 ]
 
 beforeEach(() => {
@@ -49,7 +50,8 @@ beforeEach(() => {
     sitiCohtc: structuredClone(require('../../../mocks/payment-requests/siti-cohtc')),
     sitiCohtr: structuredClone(require('../../../mocks/payment-requests/siti-cohtr')),
     fptt: structuredClone(require('../../../mocks/payment-requests/fptt')),
-    wmp: structuredClone(require('../../../mocks/payment-requests/wmp'))
+    wmp: structuredClone(require('../../../mocks/payment-requests/wmp')),
+    sfi26: structuredClone(require('../../../mocks/payment-requests/sfi26'))
   }
 
   lineId = ''
