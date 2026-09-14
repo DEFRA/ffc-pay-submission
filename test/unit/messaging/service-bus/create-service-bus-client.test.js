@@ -120,4 +120,24 @@ describe('create service bus client', () => {
       undefined
     )
   })
+  test('strips null retry options so SDK defaults are used', () => {
+    const config = {
+      host: 'test.servicebus.windows.net',
+      username: 'RootManageSharedAccessKey',
+      password: 'test',
+      maxRetries: 1,
+      retryDelayInMs: null
+    }
+
+    createServiceBusClient(config)
+
+    expect(ServiceBusClient).toHaveBeenCalledWith(
+      expect.any(String),
+      {
+        retryOptions: {
+          maxRetries: 1
+        }
+      }
+    )
+  })
 })
