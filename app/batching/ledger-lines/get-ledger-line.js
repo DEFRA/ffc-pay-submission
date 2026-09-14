@@ -7,7 +7,7 @@ const { getAgreementReference } = require('./get-agreement-reference')
 const { getValueMultiplier } = require('../get-value-multiplier')
 const AGREEMENT_NUMBER_INDEX = 28
 
-const getLedgerLineAP = (invoiceLine, paymentRequest, lineId, source) => {
+const getLedgerLineAP = (invoiceLine, paymentRequest, lineId) => {
   const line = [
     'Ledger',
     invoiceLine.accountCode,
@@ -48,7 +48,7 @@ const getLedgerLineAP = (invoiceLine, paymentRequest, lineId, source) => {
   return line
 }
 
-const getLedgerLineAR = (invoiceLine, paymentRequest, lineId, source) => {
+const getLedgerLineAR = (invoiceLine, paymentRequest, lineId) => {
   const valueMultiplier = getValueMultiplier(paymentRequest.providesAccountingValues)
   return [
     'L',
@@ -64,7 +64,7 @@ const getLedgerLineAR = (invoiceLine, paymentRequest, lineId, source) => {
     invoiceLine.schemeCode,
     invoiceLine.marketingYear ?? paymentRequest.marketingYear ?? NOT_APPLICABLE,
     invoiceLine.deliveryBody ?? paymentRequest.deliveryBody,
-    getAgreementReference(source, invoiceLine.agreementNumber ?? paymentRequest.agreementNumber),
+    getAgreementReference(paymentRequest.schemeId, invoiceLine.agreementNumber ?? paymentRequest.agreementNumber),
     'END'
   ]
 }

@@ -20,7 +20,7 @@ const getAPContent = (paymentRequest, batch) => {
   const rows = []
   rows.push(getVendorLineAP(paymentRequest, batch, highestValueLine, hasDifferentFundCodes))
   for (const [lineId, invoiceLine] of paymentRequest.invoiceLines.entries()) {
-    rows.push(getLedgerLineAP(invoiceLine, paymentRequest, lineId + 1, batch.scheme.batchProperties.source))
+    rows.push(getLedgerLineAP(invoiceLine, paymentRequest, lineId + 1))
   }
   return rows
 }
@@ -30,7 +30,7 @@ const getARContent = (paymentRequest, batch) => {
   const rows = []
   rows.push(getVendorLineAR(paymentRequest, batch, valueLine))
   for (const [lineId, invoiceLine] of paymentRequest.invoiceLines.entries()) {
-    rows.push(getLedgerLineAR(invoiceLine, paymentRequest, lineId + 1, batch.scheme.batchProperties.source))
+    rows.push(getLedgerLineAR(invoiceLine, paymentRequest, lineId + 1))
   }
   return rows
 }
