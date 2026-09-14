@@ -3,7 +3,7 @@ const { convertToPounds } = require('../../currency-convert')
 const { getCustomerReference } = require('../get-customer-reference')
 const { getLineId } = require('./get-line-id')
 const { getDescription } = require('./get-description')
-const { getAgreementReference } = require('../get-agreement-reference')
+const { getAgreementReference } = require('./get-agreement-reference')
 const { getValueMultiplier } = require('../get-value-multiplier')
 const AGREEMENT_NUMBER_INDEX = 28
 
@@ -36,7 +36,7 @@ const getLedgerLineAP = (invoiceLine, paymentRequest, lineId, source) => {
     '',
     '',
     '',
-    getAgreementReference(source, invoiceLine.agreementNumber ?? paymentRequest.agreementNumber),
+    getAgreementReference(paymentRequest.schemeId, invoiceLine.agreementNumber ?? paymentRequest.agreementNumber),
     '',
     'END'
   ]

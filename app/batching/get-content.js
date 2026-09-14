@@ -1,7 +1,9 @@
-const { AP } = require('../constants/ledgers')
-const { IMPS, FC, ES, CS } = require('../constants/schemes')
+const { getSchemeIds } = require('ffc-pay-schemes')
 const { getLedgerLineAP, getLedgerLineAR } = require('./ledger-lines/get-ledger-line')
 const { getVendorLineAP, getVendorLineAR } = require('./vendor-lines/get-vendor-line')
+const { AP } = require('../constants/ledgers')
+
+const { IMPS, FC, ES, CS } = getSchemeIds()
 
 const getContent = (batch) => {
   let rows = []

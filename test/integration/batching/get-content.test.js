@@ -1,7 +1,9 @@
+const { getSchemeIds, getPillars } = require('ffc-pay-schemes')
 const { AP, AR } = require('../../../app/constants/ledgers')
-const { SFI23, SFI } = require('../../../app/constants/pillars')
 const { Q1 } = require('../../../app/constants/schedules')
-const { CS, IMPS, ES, FC } = require('../../../app/constants/schemes')
+
+const { CS, IMPS, ES, FC } = getSchemeIds()
+const { SFI, SFI23 } = getPillars()
 
 const getContent = require('../../../app/batching/get-content')
 

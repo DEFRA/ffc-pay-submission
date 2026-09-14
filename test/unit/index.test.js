@@ -17,6 +17,11 @@ const { start: mockMessagingStart } = require('../../app/messaging')
 jest.mock('../../app/storage.js')
 const { initialiseContainers: mockInitialiseContainers } = require('../../app/storage')
 
+jest.mock('../../app/update-schemes-database', () => ({
+  updateSchemesDatabase: jest.fn()
+}))
+const { updateSchemesDatabase: mockUpdateSchemesDatabase } = require('../../app/update-schemes-database')
+
 const startApp = require('../../app')
 
 describe('app start', () => {
@@ -41,6 +46,11 @@ describe('app start', () => {
     config.processingActive = false
     await startApp()
     expect(mockStartServer).toHaveBeenCalled()
+  })
+
+  test('updates schemes database when starting', async () => {
+    await startApp()
+    expect(mockUpdateSchemesDatabase).toHaveBeenCalledTimes(1)
   })
 
   test('initialises containers when active is true', async () => {

@@ -1,6 +1,8 @@
+const { getSchemeIds } = require('ffc-pay-schemes')
 const { EUR, GBP } = require('../../../../app/constants/currency')
-const { BPS, ES, IMPS, SFI } = require('../../../../app/constants/schemes')
 const { getCurrency } = require('../../../../app/batching/vendor-lines/get-currency')
+
+const { BPS, ES, IMPS, SFI } = getSchemeIds()
 
 describe('get currency', () => {
   test.each([
