@@ -52,7 +52,8 @@
     "nodemon": "3.0.1"
   },
   "overrides": {
-    "uuid": "11.1.1"
+    "uuid": "11.1.1",
+    "joi": "18.2.9"
   },
   "nodemonConfig": {
     "ignore": [
