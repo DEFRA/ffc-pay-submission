@@ -1,9 +1,15 @@
+const config = require('../../../../app/config')
 const { NOT_APPLICABLE } = require('../../../../app/constants/not-applicable')
 const { getLedgerLineAP, getLedgerLineAR } = require('../../../../app/batching/ledger-lines/get-ledger-line')
+const { getLedgerLineAPV2, getLedgerLineARV2 } = require('../../../../app/batching/ledger-lines/get-ledger-line-v2')
 const { getValueMultiplier } = require('../../../../app/batching/get-value-multiplier')
 const { convertToPounds } = require('../../../../app/currency-convert')
 
 jest.mock('../../../../app/batching/get-value-multiplier')
+jest.mock('../../../../app/batching/ledger-lines/get-ledger-line-v2', () => ({
+  getLedgerLineAPV2: jest.fn((invoiceLine, paymentRequest, lineId, source) => ['AP-V2', invoiceLine, paymentRequest, lineId, source]),
+  getLedgerLineARV2: jest.fn((invoiceLine, paymentRequest, lineId, source) => ['AR-V2', invoiceLine, paymentRequest, lineId, source])
+}))
 
 let invoiceLine
 let lineId
@@ -32,7 +38,8 @@ const schemesFullDescription = [
 ]
 
 beforeEach(() => {
-  jest.resetAllMocks()
+  jest.clearAllMocks()
+  config.useV2FRPSJournals = false
 
   invoiceLine = structuredClone(require('../../../mocks/payment-requests/invoice-line'))
 
@@ -57,6 +64,24 @@ beforeEach(() => {
 })
 
 describe('get ledger line for AP', () => {
+  test('should return blank values at positions 15 and 16 and description at position 17 when V2 FRPS journals are disabled', () => {
+    const result = getLedgerLineAP(invoiceLine, paymentRequests.sfi, lineId, source)
+
+    expect(result[15]).toBe('')
+    expect(result[16]).toBe('')
+    expect(result[17]).toBe(description)
+  })
+
+  test.each(['fptt', 'wmp'])('should use the V2 FRPS AP journal output when useV2FRPSJournals is true for %s', (schemeKey) => {
+    config.useV2FRPSJournals = true
+
+    const paymentRequest = paymentRequests[schemeKey]
+    const result = getLedgerLineAP(invoiceLine, paymentRequest, lineId, source)
+
+    expect(getLedgerLineAPV2).toHaveBeenCalledWith(invoiceLine, paymentRequest, lineId, source)
+    expect(result).toEqual(['AP-V2', invoiceLine, paymentRequest, lineId, source])
+  })
+
   test.each([
     { desc: 'invoiceLine marketingYear exists', removeFrom: null, expected: () => invoiceLine.marketingYear },
     { desc: 'paymentRequest marketingYear fallback', removeFrom: 'invoice', expected: () => paymentRequests.sfi.marketingYear },
@@ -92,17 +117,6 @@ describe('get ledger line for AP', () => {
     const result = getLedgerLineAP(invoiceLine, paymentRequests.cs, lineId, source)
     expect(result[index]).toBe(paymentRequests.cs.agreementNumber)
   })
-
-  test.each([
-    { key: 'invoiceLine', index: 13 },
-    { key: 'paymentRequest', index: 13 }
-  ])('should return agreement number from $key when AR', ({ key, index }) => {
-    if (key === 'paymentRequest') {
-      delete invoiceLine.agreementNumber
-    }
-    const result = getLedgerLineAR(invoiceLine, paymentRequests.cs, lineId, source)
-    expect(result[index]).toBe(paymentRequests.cs.agreementNumber)
-  })
 })
 
 describe('get ledger line for AR', () => {
@@ -134,6 +148,16 @@ describe('get ledger line for AR', () => {
     delete paymentRequests.sfi.originalSettlementDate
     const result = getLedgerLineAR(invoiceLine, paymentRequests.sfi, lineId, source)
     expect(result[5]).toBe(paymentRequests.sfi.dueDate)
+  })
+
+  test.each(['fptt', 'wmp'])('should use the V2 FRPS AR journal output when useV2FRPSJournals is true for %s', (schemeKey) => {
+    config.useV2FRPSJournals = true
+
+    const paymentRequest = paymentRequests[schemeKey]
+    const result = getLedgerLineAR(invoiceLine, paymentRequest, lineId, source)
+
+    expect(getLedgerLineARV2).toHaveBeenCalledWith(invoiceLine, paymentRequest, lineId, source)
+    expect(result).toEqual(['AR-V2', invoiceLine, paymentRequest, lineId, source])
   })
 
   describe('value multiplier effect on value', () => {

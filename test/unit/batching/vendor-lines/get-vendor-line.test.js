@@ -1,11 +1,28 @@
+const config = require('../../../../app/config')
 const { EUR } = require('../../../../app/constants/currency')
 const { AR } = require('../../../../app/constants/ledgers')
 const { NOT_APPLICABLE } = require('../../../../app/constants/not-applicable')
 const { getVendorLineAP, getVendorLineAR } = require('../../../../app/batching/vendor-lines/get-vendor-line')
+const { getVendorLineAPV2, getVendorLineARV2 } = require('../../../../app/batching/vendor-lines/get-vendor-line-v2')
 const { getValueMultiplier } = require('../../../../app/batching/get-value-multiplier')
 const { convertToPounds } = require('../../../../app/currency-convert')
 
 jest.mock('../../../../app/batching/get-value-multiplier')
+jest.mock('../../../../app/batching/vendor-lines/get-vendor-line-v2', () => ({
+  getVendorLineAPV2: jest.fn((paymentRequest, batch, highestValueLine, hasDifferentFundCodes) => [
+    'AP-V2',
+    paymentRequest,
+    batch,
+    highestValueLine,
+    hasDifferentFundCodes
+  ]),
+  getVendorLineARV2: jest.fn((paymentRequest, batch, lowestValueLine) => [
+    'AR-V2',
+    paymentRequest,
+    batch,
+    lowestValueLine
+  ])
+}))
 
 let paymentRequest
 let bpsPaymentRequest
@@ -13,10 +30,19 @@ let batch
 let highestValueLine
 let lowestValueLine
 let hasDifferentFundCodes
+let paymentRequests
 
 beforeEach(() => {
+  jest.clearAllMocks()
+  config.useV2FRPSJournals = false
+
   paymentRequest = structuredClone(require('../../../mocks/payment-requests/payment-request'))
   bpsPaymentRequest = structuredClone(require('../../../mocks/payment-requests/bps'))
+
+  paymentRequests = {
+    fptt: structuredClone(require('../../../mocks/payment-requests/fptt')),
+    wmp: structuredClone(require('../../../mocks/payment-requests/wmp'))
+  }
 
   batch = {
     scheme: {
@@ -47,6 +73,16 @@ describe('get AP vendor line', () => {
       expect(line[25]).toBe(expected26)
     }
   )
+
+  test.each(['fptt', 'wmp'])('should use the V2 FRPS AP vendor journal output when useV2FRPSJournals is true for %s', (schemeKey) => {
+    config.useV2FRPSJournals = true
+
+    const request = paymentRequests[schemeKey]
+    const line = getVendorLineAP(request, batch, highestValueLine, hasDifferentFundCodes)
+
+    expect(getVendorLineAPV2).toHaveBeenCalledWith(request, batch, highestValueLine, hasDifferentFundCodes)
+    expect(line).toEqual(['AP-V2', request, batch, highestValueLine, hasDifferentFundCodes])
+  })
 
   test('should handle schedule presence for item 29-30', () => {
     let line = getVendorLineAP(paymentRequest, batch, highestValueLine, hasDifferentFundCodes)
@@ -112,6 +148,16 @@ describe('get AR vendor line', () => {
       expect(line[15]).toBe(expected16)
     }
   )
+
+  test.each(['fptt', 'wmp'])('should use the V2 FRPS AR vendor journal output when useV2FRPSJournals is true for %s', (schemeKey) => {
+    config.useV2FRPSJournals = true
+
+    const request = paymentRequests[schemeKey]
+    const line = getVendorLineAR(request, batch, lowestValueLine)
+
+    expect(getVendorLineARV2).toHaveBeenCalledWith(request, batch, lowestValueLine)
+    expect(line).toEqual(['AR-V2', request, batch, lowestValueLine])
+  })
 
   test('should handle marketing year presence for item 20', () => {
     const line = getVendorLineAR(paymentRequest, batch, lowestValueLine)
