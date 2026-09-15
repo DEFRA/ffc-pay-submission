@@ -15,5 +15,6 @@ module.exports = {
   SITICOHTR: 15,
   SITICOHTC: 16,
   FPTT: 17,
-  WMP: 18
+  WMP: 18,
+  SFI26: 19
 }
