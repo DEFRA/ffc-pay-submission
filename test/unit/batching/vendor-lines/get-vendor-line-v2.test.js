@@ -45,7 +45,7 @@ test('getVendorLineAPV2 returns the expected AP vendor line', () => {
     schemeCode: 'SCHEME-1'
   }
 
-  const result = getVendorLineAPV2(paymentRequest, batch, highestValueLine, false)
+  const result = getVendorLineAPV2(paymentRequest, batch, highestValueLine)
 
   expect(getValueMultiplier).toHaveBeenCalledWith(true)
   expect(convertToPounds).toHaveBeenCalledWith(-2500)
@@ -100,7 +100,7 @@ test('getVendorLineAPV2 falls back to batch source when fesCode is not provided'
     schemeCode: 'SCHEME-2'
   }
 
-  const result = getVendorLineAPV2(paymentRequest, batch, highestValueLine, true)
+  const result = getVendorLineAPV2(paymentRequest, batch, highestValueLine)
 
   expect(getValueMultiplier).toHaveBeenCalledWith(false)
   expect(convertToPounds).toHaveBeenCalledWith(1500)

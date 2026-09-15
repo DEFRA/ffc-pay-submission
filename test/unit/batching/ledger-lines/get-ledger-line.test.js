@@ -7,8 +7,8 @@ const { convertToPounds } = require('../../../../app/currency-convert')
 
 jest.mock('../../../../app/batching/get-value-multiplier')
 jest.mock('../../../../app/batching/ledger-lines/get-ledger-line-v2', () => ({
-  getLedgerLineAPV2: jest.fn((invoiceLine, paymentRequest, lineId, source) => ['AP-V2', invoiceLine, paymentRequest, lineId, source]),
-  getLedgerLineARV2: jest.fn((invoiceLine, paymentRequest, lineId, source) => ['AR-V2', invoiceLine, paymentRequest, lineId, source])
+  getLedgerLineAPV2: jest.fn((invoiceLine, paymentRequest, lineId) => ['AP-V2', invoiceLine, paymentRequest, lineId]),
+  getLedgerLineARV2: jest.fn((invoiceLine, paymentRequest, lineId) => ['AR-V2', invoiceLine, paymentRequest, lineId])
 }))
 
 let invoiceLine
@@ -78,8 +78,8 @@ describe('get ledger line for AP', () => {
     const paymentRequest = paymentRequests[schemeKey]
     const result = getLedgerLineAP(invoiceLine, paymentRequest, lineId, source)
 
-    expect(getLedgerLineAPV2).toHaveBeenCalledWith(invoiceLine, paymentRequest, lineId, source)
-    expect(result).toEqual(['AP-V2', invoiceLine, paymentRequest, lineId, source])
+    expect(getLedgerLineAPV2).toHaveBeenCalledWith(invoiceLine, paymentRequest, lineId)
+    expect(result).toEqual(['AP-V2', invoiceLine, paymentRequest, lineId])
   })
 
   test.each([
@@ -156,8 +156,8 @@ describe('get ledger line for AR', () => {
     const paymentRequest = paymentRequests[schemeKey]
     const result = getLedgerLineAR(invoiceLine, paymentRequest, lineId, source)
 
-    expect(getLedgerLineARV2).toHaveBeenCalledWith(invoiceLine, paymentRequest, lineId, source)
-    expect(result).toEqual(['AR-V2', invoiceLine, paymentRequest, lineId, source])
+    expect(getLedgerLineARV2).toHaveBeenCalledWith(invoiceLine, paymentRequest, lineId)
+    expect(result).toEqual(['AR-V2', invoiceLine, paymentRequest, lineId])
   })
 
   describe('value multiplier effect on value', () => {

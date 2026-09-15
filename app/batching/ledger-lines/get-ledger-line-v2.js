@@ -2,7 +2,7 @@ const { convertToPounds } = require('../../currency-convert')
 const { getDescription } = require('./get-description')
 const { getValueMultiplier } = require('../get-value-multiplier')
 
-const getLedgerLineAPV2 = (invoiceLine, paymentRequest, lineId, source) => {
+const getLedgerLineAPV2 = (invoiceLine, paymentRequest, lineId) => {
   return [
     'Ledger',
     lineId,
@@ -18,7 +18,7 @@ const getLedgerLineAPV2 = (invoiceLine, paymentRequest, lineId, source) => {
   ]
 }
 
-const getLedgerLineARV2 = (invoiceLine, paymentRequest, lineId, source) => {
+const getLedgerLineARV2 = (invoiceLine, paymentRequest, lineId) => {
   const valueMultiplier = getValueMultiplier(paymentRequest.providesAccountingValues)
   return [
     'Ledger',

@@ -39,7 +39,7 @@ test('getLedgerLineAPV2 returns the expected AP ledger line', () => {
     deliveryBody: 'PAY-DB'
   }
 
-  const result = getLedgerLineAPV2(invoiceLine, paymentRequest, 'LINE-1', 'source')
+  const result = getLedgerLineAPV2(invoiceLine, paymentRequest, 'LINE-1')
 
   expect(convertToPounds).toHaveBeenCalledWith(100)
   expect(getDescription).toHaveBeenCalledWith('SCHEME-ABC', 'Test description')
@@ -76,7 +76,7 @@ test('getLedgerLineAPV2 uses payment request values when invoice values are miss
     deliveryBody: 'PAY-DB-2'
   }
 
-  const result = getLedgerLineAPV2(invoiceLine, paymentRequest, 'LINE-2', 'source')
+  const result = getLedgerLineAPV2(invoiceLine, paymentRequest, 'LINE-2')
 
   expect(result).toEqual([
     'Ledger',
@@ -113,7 +113,7 @@ test('getLedgerLineARV2 returns the expected AR ledger line', () => {
     providesAccountingValues: true
   }
 
-  const result = getLedgerLineARV2(invoiceLine, paymentRequest, 'LINE-3', 'source')
+  const result = getLedgerLineARV2(invoiceLine, paymentRequest, 'LINE-3')
 
   expect(getValueMultiplier).toHaveBeenCalledWith(true)
   expect(convertToPounds).toHaveBeenCalledWith(-100)

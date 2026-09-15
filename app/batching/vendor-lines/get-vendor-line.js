@@ -20,7 +20,7 @@ const AGREEMENT_NUMBER_INDEX = 28
 
 const getVendorLineAP = (paymentRequest, batch, highestValueLine, hasDifferentFundCodes) => {
   if (config.useV2FRPSJournals && isFRPS(paymentRequest.schemeId)) {
-    return getVendorLineAPV2(paymentRequest, batch, highestValueLine, hasDifferentFundCodes)
+    return getVendorLineAPV2(paymentRequest, batch, highestValueLine)
   }
 
   const schedule = getSchedule(paymentRequest.schedule, paymentRequest.pillar)

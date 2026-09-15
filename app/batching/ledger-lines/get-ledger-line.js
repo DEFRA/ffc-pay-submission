@@ -13,7 +13,7 @@ const AGREEMENT_NUMBER_INDEX = 28
 
 const getLedgerLineAP = (invoiceLine, paymentRequest, lineId, source) => {
   if (config.useV2FRPSJournals && isFRPS(paymentRequest.schemeId)) {
-    return getLedgerLineAPV2(invoiceLine, paymentRequest, lineId, source)
+    return getLedgerLineAPV2(invoiceLine, paymentRequest, lineId)
   }
 
   const line = [
@@ -58,7 +58,7 @@ const getLedgerLineAP = (invoiceLine, paymentRequest, lineId, source) => {
 
 const getLedgerLineAR = (invoiceLine, paymentRequest, lineId, source) => {
   if (config.useV2FRPSJournals && isFRPS(paymentRequest.schemeId)) {
-    return getLedgerLineARV2(invoiceLine, paymentRequest, lineId, source)
+    return getLedgerLineARV2(invoiceLine, paymentRequest, lineId)
   }
 
   const valueMultiplier = getValueMultiplier(paymentRequest.providesAccountingValues)

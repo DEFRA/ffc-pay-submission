@@ -1,7 +1,7 @@
 const { convertToPounds } = require('../../currency-convert')
 const { getValueMultiplier } = require('../get-value-multiplier')
 
-const getVendorLineAPV2 = (paymentRequest, batch, highestValueLine, hasDifferentFundCodes) => {
+const getVendorLineAPV2 = (paymentRequest, batch, highestValueLine) => {
   const valueMultiplier = getValueMultiplier(paymentRequest.providesAccountingValues)
   const source = paymentRequest.fesCode ?? batch.scheme.batchProperties.source
   return [

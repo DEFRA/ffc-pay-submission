@@ -9,12 +9,11 @@ const { convertToPounds } = require('../../../../app/currency-convert')
 
 jest.mock('../../../../app/batching/get-value-multiplier')
 jest.mock('../../../../app/batching/vendor-lines/get-vendor-line-v2', () => ({
-  getVendorLineAPV2: jest.fn((paymentRequest, batch, highestValueLine, hasDifferentFundCodes) => [
+  getVendorLineAPV2: jest.fn((paymentRequest, batch, highestValueLine) => [
     'AP-V2',
     paymentRequest,
     batch,
-    highestValueLine,
-    hasDifferentFundCodes
+    highestValueLine
   ]),
   getVendorLineARV2: jest.fn((paymentRequest, batch, lowestValueLine) => [
     'AR-V2',
@@ -80,8 +79,8 @@ describe('get AP vendor line', () => {
     const request = paymentRequests[schemeKey]
     const line = getVendorLineAP(request, batch, highestValueLine, hasDifferentFundCodes)
 
-    expect(getVendorLineAPV2).toHaveBeenCalledWith(request, batch, highestValueLine, hasDifferentFundCodes)
-    expect(line).toEqual(['AP-V2', request, batch, highestValueLine, hasDifferentFundCodes])
+    expect(getVendorLineAPV2).toHaveBeenCalledWith(request, batch, highestValueLine)
+    expect(line).toEqual(['AP-V2', request, batch, highestValueLine])
   })
 
   test('should handle schedule presence for item 29-30', () => {
