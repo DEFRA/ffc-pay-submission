@@ -19,7 +19,7 @@
   <changeSet author="Alistair Wishart" id="4">
       <insert tableName="batchProperties">
       <column name="schemeId" value="19" />
-      <column name="prefix" value="FFCSFI26" />
+      <column name="prefix" value="FFCSITISTI26" />
       <column name="suffix" value=" (SITISFI26)" />
       <column name="source" value="SITISFI26" />
     </insert>
