@@ -1,4 +1,4 @@
-const { SFI } = require('../../../app/constants/schemes')
+const { getSchemeIds } = require('ffc-pay-schemes')
 const { GBP } = require('../../../app/constants/currency')
 const { M12 } = require('../../../app/constants/schedules')
 const { AP } = require('../../../app/constants/ledgers')
@@ -18,6 +18,8 @@ const { MARKETING_YEAR } = require('../values/marketing-year')
 const { DUE_DATE_DAX } = require('../values/due-date')
 const { PENALTY_DESCRIPTION } = require('../values/description')
 const invoiceLine = require('./invoice-line')
+
+const { SFI } = getSchemeIds()
 
 module.exports = {
   correlationId: CORRELATION_ID,

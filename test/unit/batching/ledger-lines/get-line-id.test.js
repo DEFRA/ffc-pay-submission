@@ -1,5 +1,7 @@
-const { ES, IMPS, SFI } = require('../../../../app/constants/schemes')
+const { getSchemeIds } = require('ffc-pay-schemes')
 const { getLineId } = require('../../../../app/batching/ledger-lines/get-line-id')
+
+const { ES, IMPS, SFI } = getSchemeIds()
 
 const lineId = 1
 

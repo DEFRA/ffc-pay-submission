@@ -1,6 +1,7 @@
-const { ES, FC, IMPS } = require('../../../app/constants/schemes')
-
+const { getSchemeIds } = require('ffc-pay-schemes')
 const { getCustomerReference } = require('../../../app/batching/get-customer-reference')
+
+const { ES, FC, IMPS } = getSchemeIds()
 
 let paymentRequest
 
