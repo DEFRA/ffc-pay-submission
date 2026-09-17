@@ -18,36 +18,41 @@ const { getVendorLineAPV2, getVendorLineARV2 } = require('./get-vendor-line-v2')
 const AGREEMENT_NUMBER_INDEX = 28
 const stringifiedNumbers = new Set(['0', '1'])
 
-const getVendorLineAP = (paymentRequest, batch, highestValueLine, hasDifferentFundCodes) => {
-  if (config.useV2FRPSJournals && isFRPS(paymentRequest.schemeId)) {
-    return getVendorLineAPV2(paymentRequest, batch, highestValueLine)
-  }
+const getStringifiedNumber = (value) => (
+  stringifiedNumbers.has(value) ? Number(value) : value
+)
 
+const getVendorFundCode = (hasDifferentFundCodes, highestValueLine) => (
+  hasDifferentFundCodes ? 'XXXXX' : highestValueLine.fundCode
+)
+
+const getLegacyVendorLineAP = (
+  paymentRequest,
+  batch,
+  highestValueLine,
+  hasDifferentFundCodes
+) => {
   const schedule = getSchedule(paymentRequest.schedule, paymentRequest.pillar)
   const valueMultiplier = getValueMultiplier(paymentRequest.providesAccountingValues)
   const source = paymentRequest.fesCode ?? batch.scheme.batchProperties.source
-  const paymentType = getPaymentType(paymentRequest.schemeId, paymentRequest.paymentType)
-  const paymentTypeValue = stringifiedNumbers.has(paymentType) ? Number(paymentType) : paymentType
-  const paymentDescription = getPaymentDescription(paymentRequest.schemeId)
-  const paymentDescriptionValue = stringifiedNumbers.has(paymentDescription) ? Number(paymentDescription) : paymentDescription
 
   const line = [
     'Vendor',
     paymentRequest.frn,
     paymentRequest.claimDate ?? '',
-    hasDifferentFundCodes ? 'XXXXX' : highestValueLine.fundCode,
+    getVendorFundCode(hasDifferentFundCodes, highestValueLine),
     highestValueLine.schemeCode,
     paymentRequest.marketingYear ?? NOT_APPLICABLE,
     paymentRequest.deliveryBody,
     paymentRequest.invoiceNumber,
-    convertToPounds((paymentRequest.value * valueMultiplier)),
+    convertToPounds(paymentRequest.value * valueMultiplier),
     paymentRequest.currency,
     getCustomerReference(paymentRequest),
     '',
     getContractNumber(paymentRequest.schemeId, paymentRequest.contractNumber, paymentRequest.invoiceNumber),
-    paymentTypeValue,
+    getStringifiedNumber(getPaymentType(paymentRequest.schemeId, paymentRequest.paymentType)),
     '',
-    paymentDescriptionValue,
+    getStringifiedNumber(getPaymentDescription(paymentRequest.schemeId)),
     '',
     getHeaderDescription(paymentRequest),
     '',
@@ -69,6 +74,14 @@ const getVendorLineAP = (paymentRequest, batch, highestValueLine, hasDifferentFu
   }
 
   return line
+}
+
+const getVendorLineAP = (paymentRequest, batch, highestValueLine, hasDifferentFundCodes) => {
+  const isV2Journal = config.useV2FRPSJournals && isFRPS(paymentRequest.schemeId)
+
+  return isV2Journal
+    ? getVendorLineAPV2(paymentRequest, batch, highestValueLine)
+    : getLegacyVendorLineAP(paymentRequest, batch, highestValueLine, hasDifferentFundCodes)
 }
 
 const getVendorLineAR = (paymentRequest, batch, lowestValueLine) => {
