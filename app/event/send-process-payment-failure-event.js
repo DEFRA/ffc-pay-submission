@@ -1,5 +1,5 @@
-const messageConfig = require('../config/mq-config')
 const { EventPublisher } = require('ffc-pay-event-publisher')
+const messageConfig = require('../config/mq-config')
 
 const sendProcessPaymentFailureEvent = async (data, type, error) => {
   const event = {

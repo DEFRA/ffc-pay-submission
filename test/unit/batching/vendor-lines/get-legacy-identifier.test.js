@@ -1,4 +1,5 @@
-const { SFI, BPS } = require('../../../../app/constants/schemes')
+const { getSchemeIds } = require('ffc-pay-schemes')
+const { SFI, BPS } = getSchemeIds()
 
 const { getLegacyIdentifier } = require('../../../../app/batching/vendor-lines/get-legacy-identifier')
 const { FRN } = require('../../../mocks/values/frn')

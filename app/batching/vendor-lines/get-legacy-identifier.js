@@ -1,4 +1,6 @@
-const { BPS } = require('../../constants/schemes')
+const { getSchemeIds } = require('ffc-pay-schemes')
+
+const { BPS } = getSchemeIds()
 
 const getLegacyIdentifier = (schemeId, FRN) => {
   if (schemeId === BPS) {

@@ -1,5 +1,7 @@
+const { getPillars } = require('ffc-pay-schemes')
 const { Q1 } = require('../../constants/schedules')
-const { SFI, SFI23 } = require('../../constants/pillars')
+
+const { SFI, SFI23 } = getPillars()
 
 const getSchedule = (schedule, pillar) => {
   if (schedule) {
