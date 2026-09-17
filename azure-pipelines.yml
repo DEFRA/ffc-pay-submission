@@ -51,36 +51,43 @@ extends:
     variableGroupName: ffc-pay-submission-env-var
     pr_params:
       container.processingActive: $(pr_processingActive)
+      container.useV2FRPSJournals: $(pr_useV2FRPSJournals)
       container.batchGenerationInterval: $(pr_batchGenerationInterval)
       container.batchSize: $(pr_batchSize)
       container.batchCap: $(pr_batchCap)
     snd1_params:
       container.processingActive: $(snd1_processingActive)
+      container.useV2FRPSJournals: $(snd1_useV2FRPSJournals)
       container.batchGenerationInterval: $(snd1_batchGenerationInterval)
       container.batchSize: $(snd1_batchSize)
       container.batchCap: $(snd1_batchCap)
     snd2_params:
       container.processingActive: $(snd2_processingActive)
+      container.useV2FRPSJournals: $(snd2_useV2FRPSJournals)
       container.batchGenerationInterval: $(snd2_batchGenerationInterval)
       container.batchSize: $(snd2_batchSize)
       container.batchCap: $(snd2_batchCap)
     dev_params:
       container.processingActive: $(dev_processingActive)
+      container.useV2FRPSJournals: $(dev_useV2FRPSJournals)
       container.batchGenerationInterval: $(dev_batchGenerationInterval)
       container.batchSize: $(dev_batchSize)
       container.batchCap: $(dev_batchCap)
     test_params:
       container.processingActive: $(test_processingActive)
+      container.useV2FRPSJournals: $(test_useV2FRPSJournals)
       container.batchGenerationInterval: $(test_batchGenerationInterval)
       container.batchSize: $(test_batchSize)
       container.batchCap: $(test_batchCap)
     pre_params:
       container.processingActive: $(pre_processingActive)
+      container.useV2FRPSJournals: $(pre_useV2FRPSJournals)
       container.batchGenerationInterval: $(pre_batchGenerationInterval)
       container.batchSize: $(pre_batchSize)
       container.batchCap: $(pre_batchCap)
     prd_params:
       container.processingActive: $(prd_processingActive)
+      container.useV2FRPSJournals: $(prd_useV2FRPSJournals)
       container.batchGenerationInterval: $(prd_batchGenerationInterval)
       container.batchSize: $(prd_batchSize)
       container.batchCap: $(prd_batchCap)

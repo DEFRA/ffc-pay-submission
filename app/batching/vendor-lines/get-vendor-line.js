@@ -1,4 +1,5 @@
-const { getJournalSourceFromPillar } = require('ffc-pay-schemes')
+const { getJournalSourceFromPillar, isFRPS } = require('ffc-pay-schemes')
+const config = require('../../config')
 const { convertToPounds } = require('../../currency-convert')
 const { getContractNumber } = require('./get-contract-number')
 const { getCustomerReference } = require('../get-customer-reference')
@@ -12,11 +13,16 @@ const { getSchedule } = require('./get-schedule')
 const { getLegacyIdentifier } = require('./get-legacy-identifier')
 const { getValueMultiplier } = require('../get-value-multiplier')
 const { NOT_APPLICABLE } = require('../../constants/not-applicable')
+const { getVendorLineAPV2, getVendorLineARV2 } = require('./get-vendor-line-v2')
 
 const AGREEMENT_NUMBER_INDEX = 28
 const stringifiedNumbers = new Set(['0', '1'])
 
 const getVendorLineAP = (paymentRequest, batch, highestValueLine, hasDifferentFundCodes) => {
+  if (config.useV2FRPSJournals && isFRPS(paymentRequest.schemeId)) {
+    return getVendorLineAPV2(paymentRequest, batch, highestValueLine)
+  }
+
   const schedule = getSchedule(paymentRequest.schedule, paymentRequest.pillar)
   const valueMultiplier = getValueMultiplier(paymentRequest.providesAccountingValues)
   const source = paymentRequest.fesCode ?? batch.scheme.batchProperties.source
@@ -66,6 +72,10 @@ const getVendorLineAP = (paymentRequest, batch, highestValueLine, hasDifferentFu
 }
 
 const getVendorLineAR = (paymentRequest, batch, lowestValueLine) => {
+  if (config.useV2FRPSJournals && isFRPS(paymentRequest.schemeId)) {
+    return getVendorLineARV2(paymentRequest, batch, lowestValueLine)
+  }
+
   const source = paymentRequest.fesCode ?? batch.scheme.batchProperties.source
   return [
     'H',
