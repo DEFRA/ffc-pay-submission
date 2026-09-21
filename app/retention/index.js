@@ -7,9 +7,9 @@ const { removePaymentRequests } = require('./remove-payment-requests')
 const removeAgreementData = async (retentionData) => {
   const transaction = await db.sequelize.transaction()
   try {
-    const { agreementNumber, frn, schemeId, usesContractNumber } = retentionData
+    const { agreementNumber, frn, schemeId, usesContractNumber, pillar } = retentionData
 
-    const paymentRequests = await findPaymentRequests(agreementNumber, frn, schemeId, usesContractNumber, transaction)
+    const paymentRequests = await findPaymentRequests(agreementNumber, frn, schemeId, usesContractNumber, pillar, transaction)
     const paymentRequestIds = paymentRequests.map(pr => pr.paymentRequestId)
     if (paymentRequests.length === 0) {
       console.log('No agreement data to remove')
