@@ -5,6 +5,7 @@ jest.mock('ffc-pay-schemes', () => ({
 
 jest.mock('../../app/data', () => ({
   scheme: {
+    findOne: jest.fn(),
     upsert: jest.fn()
   },
   batchProperties: {
@@ -33,7 +34,7 @@ describe('updateSchemesDatabase', () => {
     console.log.mockRestore()
   })
 
-  test('updates schemes and batch properties', async () => {
+  test('updates an existing scheme and batch properties without creating a sequence', async () => {
     getSchemes.mockReturnValue([
       { schemeId: 1, schemeName: 'Sustainable Farming Incentive' }
     ])
@@ -44,10 +45,16 @@ describe('updateSchemesDatabase', () => {
       source: 'SFI Source'
     })
 
-    db.scheme.upsert.mockResolvedValue([{}, false])
-    db.batchProperties.upsert.mockResolvedValue([{}, false])
+    db.scheme.findOne.mockResolvedValue({
+      schemeId: 1,
+      name: 'Sustainable Farming Incentive'
+    })
 
     await updateSchemesDatabase()
+
+    expect(db.scheme.findOne).toHaveBeenCalledWith({
+      where: { schemeId: 1 }
+    })
 
     expect(db.scheme.upsert).toHaveBeenCalledWith({
       schemeId: 1,
@@ -77,10 +84,25 @@ describe('updateSchemesDatabase', () => {
       source: 'SFI Source'
     })
 
-    db.scheme.upsert.mockResolvedValue([{}, true])
-    db.batchProperties.upsert.mockResolvedValue([{}, true])
+    db.scheme.findOne.mockResolvedValue(null)
 
     await updateSchemesDatabase()
+
+    expect(db.scheme.findOne).toHaveBeenCalledWith({
+      where: { schemeId: 1 }
+    })
+
+    expect(db.scheme.upsert).toHaveBeenCalledWith({
+      schemeId: 1,
+      name: 'Sustainable Farming Incentive'
+    })
+
+    expect(db.batchProperties.upsert).toHaveBeenCalledWith({
+      schemeId: 1,
+      prefix: 'SFI Prefix',
+      suffix: 'SFI Suffix',
+      source: 'SFI Source'
+    })
 
     expect(db.sequence.create).toHaveBeenCalledWith({
       schemeId: 1,
@@ -107,13 +129,14 @@ describe('updateSchemesDatabase', () => {
         source: 'SOURCE'
       })
 
-    db.scheme.upsert.mockResolvedValue([{}, false])
-    db.batchProperties.upsert.mockResolvedValue([{}, false])
+    db.scheme.findOne.mockResolvedValue({})
 
     await updateSchemesDatabase()
 
+    expect(db.scheme.findOne).toHaveBeenCalledTimes(2)
     expect(db.scheme.upsert).toHaveBeenCalledTimes(2)
     expect(db.batchProperties.upsert).toHaveBeenCalledTimes(2)
     expect(getSchemeBatchProperties).toHaveBeenCalledTimes(2)
+    expect(db.sequence.create).not.toHaveBeenCalled()
   })
 })

@@ -6,10 +6,15 @@ const updateSchemesDatabase = async () => {
   const schemes = getSchemes()
 
   for (const { schemeId, schemeName } of schemes) {
-    const [, created] = await db.scheme.upsert({
+    const existingScheme = await db.scheme.findOne({
+      where: { schemeId }
+    })
+
+    await db.scheme.upsert({
       schemeId,
       name: schemeName
     })
+
     const { prefix, suffix, source } = getSchemeBatchProperties(schemeId)
     await db.batchProperties.upsert({
       schemeId,
@@ -17,6 +22,8 @@ const updateSchemesDatabase = async () => {
       suffix,
       source
     })
+
+    const created = !existingScheme
     console.log(`${schemeName} ${created ? 'created' : 'updated'} and batch properties set`)
     if (created) {
       await db.sequence.create({
