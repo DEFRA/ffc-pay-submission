@@ -1,7 +1,7 @@
 const { getSchemeIds } = require('ffc-pay-schemes')
 const {
   BPS, CS, LUMP_SUMS, SFI, SFI_PILOT, VET_VISITS, IMPS, ES,
-  SFI23, DELINKED, SFI_EXPANDED, COHT_CAPITAL, COHT_REVENUE, FPTT, WMP
+  SFI23, DELINKED, SFI_EXPANDED, COHT_CAPITAL, COHT_REVENUE, FPTT, WMP, SFI26
 } = getSchemeIds()
 const { getPaymentType } = require('../../../../app/batching/vendor-lines/get-payment-type')
 
@@ -28,7 +28,8 @@ describe('get payment type', () => {
     { scheme: COHT_REVENUE, paymentType: '0', expected: '0' },
     { scheme: COHT_CAPITAL, paymentType: '0', expected: '0' },
     { scheme: FPTT, paymentType: '0', expected: '0' },
-    { scheme: WMP, paymentType: '0', expected: '0' }
+    { scheme: WMP, paymentType: '0', expected: '0' },
+    { scheme: SFI26, paymentType: '0', expected: '0' }
   ])('returns $expected for $scheme with paymentType $paymentType', ({ scheme, paymentType, expected }) => {
     expect(getPaymentType(scheme, paymentType)).toBe(expected)
   })
