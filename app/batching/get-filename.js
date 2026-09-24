@@ -1,10 +1,11 @@
 const moment = require('moment')
-const { MANUAL } = require('../constants/schemes')
-const { getSource } = require('./vendor-lines/get-source')
+const { getJournalSourceFromPillar, getSchemeIds } = require('ffc-pay-schemes')
+
+const { MANUAL } = getSchemeIds()
 
 const getFileName = (batch, pillar, fesCode) => {
   if (batch.scheme.schemeId === MANUAL && pillar) {
-    const source = getSource(batch.scheme.schemeId, batch.scheme.batchProperties.source, pillar)
+    const source = getJournalSourceFromPillar(batch.scheme.schemeId, batch.scheme.batchProperties.source, pillar)
     if (source !== batch.scheme.batchProperties.source) {
       return `FFC${source}_${batch.sequence.toString().padStart(4, '0')}_${batch.ledger}_${moment().format('YYYYMMDDHHmmss')} (${source}).csv`
     }

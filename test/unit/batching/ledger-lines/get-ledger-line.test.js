@@ -13,7 +13,6 @@ jest.mock('../../../../app/batching/ledger-lines/get-ledger-line-v2', () => ({
 
 let invoiceLine
 let lineId
-let source
 
 let paymentRequests
 
@@ -62,12 +61,11 @@ beforeEach(() => {
   }
 
   lineId = ''
-  source = ''
 })
 
 describe('get ledger line for AP', () => {
   test('should return blank values at positions 15 and 16 and description at position 17 when V2 FRPS journals are disabled', () => {
-    const result = getLedgerLineAP(invoiceLine, paymentRequests.sfi, lineId, source)
+    const result = getLedgerLineAP(invoiceLine, paymentRequests.sfi, lineId)
 
     expect(result[15]).toBe('')
     expect(result[16]).toBe('')
@@ -78,7 +76,7 @@ describe('get ledger line for AP', () => {
     config.useV2FRPSJournals = true
 
     const paymentRequest = paymentRequests[schemeKey]
-    const result = getLedgerLineAP(invoiceLine, paymentRequest, lineId, source)
+    const result = getLedgerLineAP(invoiceLine, paymentRequest, lineId)
 
     expect(getLedgerLineAPV2).toHaveBeenCalledWith(invoiceLine, paymentRequest, lineId)
     expect(result).toEqual(['AP-V2', invoiceLine, paymentRequest, lineId])
@@ -95,17 +93,17 @@ describe('get ledger line for AP', () => {
       delete invoiceLine.marketingYear
       delete paymentRequests.sfi.marketingYear
     }
-    const result = getLedgerLineAP(invoiceLine, paymentRequests.sfi, lineId, source)
+    const result = getLedgerLineAP(invoiceLine, paymentRequests.sfi, lineId)
     expect(result[5]).toBe(expected())
   })
 
   test.each(schemesWithSubstring)('should return substring of description for %s', ({ key, description }) => {
-    const result = getLedgerLineAP(invoiceLine, paymentRequests[key], lineId, source)
+    const result = getLedgerLineAP(invoiceLine, paymentRequests[key], lineId)
     expect(result[17]).toBe(description)
   })
 
   test.each(schemesFullDescription)('should not return substring of description for %s', ({ key, description }) => {
-    const result = getLedgerLineAP(invoiceLine, paymentRequests[key], lineId, source)
+    const result = getLedgerLineAP(invoiceLine, paymentRequests[key], lineId)
     expect(result[17]).toBe(description)
   })
 
@@ -116,39 +114,50 @@ describe('get ledger line for AP', () => {
     if (key === 'paymentRequest') {
       delete invoiceLine.agreementNumber
     }
-    const result = getLedgerLineAP(invoiceLine, paymentRequests.cs, lineId, source)
+    const result = getLedgerLineAP(invoiceLine, paymentRequests.cs, lineId)
+    expect(result[index]).toBe(paymentRequests.cs.agreementNumber)
+  })
+
+  test.each([
+    { key: 'invoiceLine', index: 13 },
+    { key: 'paymentRequest', index: 13 }
+  ])('should return agreement number from $key when AR', ({ key, index }) => {
+    if (key === 'paymentRequest') {
+      delete invoiceLine.agreementNumber
+    }
+    const result = getLedgerLineAR(invoiceLine, paymentRequests.cs, lineId)
     expect(result[index]).toBe(paymentRequests.cs.agreementNumber)
   })
 })
 
 describe('get ledger line for AR', () => {
   test('should return marketing year from invoice line when present', () => {
-    const result = getLedgerLineAR(invoiceLine, paymentRequests.sfi, lineId, source)
+    const result = getLedgerLineAR(invoiceLine, paymentRequests.sfi, lineId)
     expect(result[11]).toBe(invoiceLine.marketingYear)
   })
 
   test('should return marketing year from payment request when not present on invoice line', () => {
     delete invoiceLine.marketingYear
-    const result = getLedgerLineAR(invoiceLine, paymentRequests.sfi, lineId, source)
+    const result = getLedgerLineAR(invoiceLine, paymentRequests.sfi, lineId)
     expect(result[11]).toBe(paymentRequests.sfi.marketingYear)
   })
 
   test('should return not applicable marketing year when marketing year not present on invoice line or payment request', () => {
     delete invoiceLine.marketingYear
     delete paymentRequests.sfi.marketingYear
-    const result = getLedgerLineAR(invoiceLine, paymentRequests.sfi, lineId, source)
+    const result = getLedgerLineAR(invoiceLine, paymentRequests.sfi, lineId)
     expect(result[11]).toBe(NOT_APPLICABLE)
   })
 
   test('should return original settlement date when present', () => {
     paymentRequests.sfi.originalSettlementDate = '01/01/2023'
-    const result = getLedgerLineAR(invoiceLine, paymentRequests.sfi, lineId, source)
+    const result = getLedgerLineAR(invoiceLine, paymentRequests.sfi, lineId)
     expect(result[5]).toBe(paymentRequests.sfi.originalSettlementDate)
   })
 
   test('should return due date when original settlement date not present', () => {
     delete paymentRequests.sfi.originalSettlementDate
-    const result = getLedgerLineAR(invoiceLine, paymentRequests.sfi, lineId, source)
+    const result = getLedgerLineAR(invoiceLine, paymentRequests.sfi, lineId)
     expect(result[5]).toBe(paymentRequests.sfi.dueDate)
   })
 
@@ -156,7 +165,7 @@ describe('get ledger line for AR', () => {
     config.useV2FRPSJournals = true
 
     const paymentRequest = paymentRequests[schemeKey]
-    const result = getLedgerLineAR(invoiceLine, paymentRequest, lineId, source)
+    const result = getLedgerLineAR(invoiceLine, paymentRequest, lineId)
 
     expect(getLedgerLineARV2).toHaveBeenCalledWith(invoiceLine, paymentRequest, lineId)
     expect(result).toEqual(['AR-V2', invoiceLine, paymentRequest, lineId])
@@ -165,13 +174,13 @@ describe('get ledger line for AR', () => {
   describe('value multiplier effect on value', () => {
     test('should multiply invoice line value by 1 when valueMultiplier is 1', () => {
       getValueMultiplier.mockReturnValue(1)
-      const result = getLedgerLineAR(invoiceLine, paymentRequests.sfi, lineId, source)
+      const result = getLedgerLineAR(invoiceLine, paymentRequests.sfi, lineId)
       expect(result[3]).toBe(convertToPounds(invoiceLine.value))
     })
 
     test('should multiply invoice line value by -1 when valueMultiplier is -1', () => {
       getValueMultiplier.mockReturnValue(-1)
-      const result = getLedgerLineAR(invoiceLine, paymentRequests.sfi, lineId, source)
+      const result = getLedgerLineAR(invoiceLine, paymentRequests.sfi, lineId)
       expect(result[3]).toBe(convertToPounds(invoiceLine.value * -1))
     })
   })

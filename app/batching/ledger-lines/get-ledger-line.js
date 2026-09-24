@@ -4,14 +4,14 @@ const { convertToPounds } = require('../../currency-convert')
 const { getCustomerReference } = require('../get-customer-reference')
 const { getLineId } = require('./get-line-id')
 const { getDescription } = require('./get-description')
-const { getAgreementReference } = require('../get-agreement-reference')
+const { getAgreementReference } = require('./get-agreement-reference')
 const { getValueMultiplier } = require('../get-value-multiplier')
 const { NOT_APPLICABLE } = require('../../constants/not-applicable')
 const { getLedgerLineAPV2, getLedgerLineARV2 } = require('./get-ledger-line-v2')
 
 const AGREEMENT_NUMBER_INDEX = 28
 
-const getLedgerLineAP = (invoiceLine, paymentRequest, lineId, source) => {
+const getLedgerLineAP = (invoiceLine, paymentRequest, lineId) => {
   if (config.useV2FRPSJournals && isFRPS(paymentRequest.schemeId)) {
     return getLedgerLineAPV2(invoiceLine, paymentRequest, lineId)
   }
@@ -44,7 +44,7 @@ const getLedgerLineAP = (invoiceLine, paymentRequest, lineId, source) => {
     '',
     '',
     '',
-    getAgreementReference(source, invoiceLine.agreementNumber ?? paymentRequest.agreementNumber),
+    getAgreementReference(paymentRequest.schemeId, invoiceLine.agreementNumber ?? paymentRequest.agreementNumber),
     '',
     'END'
   ]
@@ -56,7 +56,7 @@ const getLedgerLineAP = (invoiceLine, paymentRequest, lineId, source) => {
   return line
 }
 
-const getLedgerLineAR = (invoiceLine, paymentRequest, lineId, source) => {
+const getLedgerLineAR = (invoiceLine, paymentRequest, lineId) => {
   if (config.useV2FRPSJournals && isFRPS(paymentRequest.schemeId)) {
     return getLedgerLineARV2(invoiceLine, paymentRequest, lineId)
   }
@@ -76,7 +76,7 @@ const getLedgerLineAR = (invoiceLine, paymentRequest, lineId, source) => {
     invoiceLine.schemeCode,
     invoiceLine.marketingYear ?? paymentRequest.marketingYear ?? NOT_APPLICABLE,
     invoiceLine.deliveryBody ?? paymentRequest.deliveryBody,
-    getAgreementReference(source, invoiceLine.agreementNumber ?? paymentRequest.agreementNumber),
+    getAgreementReference(paymentRequest.schemeId, invoiceLine.agreementNumber ?? paymentRequest.agreementNumber),
     'END'
   ]
 }
