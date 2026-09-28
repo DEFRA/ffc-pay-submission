@@ -1,5 +1,13 @@
+const { createKnexMock } = require('../../helpers/mock-knex')
+
+const mockDb = createKnexMock()
+
 jest.mock('ffc-messaging')
-jest.mock('../../../app/data')
+jest.mock('../../../app/database', () => ({
+  client: mockDb.knex,
+  transaction: mockDb.transaction,
+  close: mockDb.close
+}))
 
 jest.mock('../../../app/inbound', () => jest.fn())
 

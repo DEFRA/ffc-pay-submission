@@ -1,10 +1,10 @@
-const db = require('../data')
+const db = require('../database')
 const config = require('../config')
 const { AP, AR } = require('../constants/ledgers')
 const MAX_BATCH_SEQUENCE = 9999
 
 const allocateToBatches = async (created = new Date()) => {
-  const transaction = await db.sequelize.transaction()
+  const transaction = await db.transaction()
   try {
     const schemes = await getSchemes()
     for (const scheme of schemes) {
@@ -26,11 +26,11 @@ const allocateToBatches = async (created = new Date()) => {
 }
 
 const getSchemes = async () => {
-  return db.scheme.findAll()
+  return db.scheme()
 }
 
 const getPendingPaymentRequests = async (schemeId, ledger, transaction) => {
-  const queue = await db.sequelize.query(`
+  const { rows: queue } = await transaction.raw(`
     SELECT
       queue.*,
       "paymentRequests"."pillar"
@@ -46,14 +46,9 @@ const getPendingPaymentRequests = async (schemeId, ledger, transaction) => {
     LIMIT :batchSize
     FOR UPDATE OF "queue" SKIP LOCKED
   `, {
-    replacements: {
-      schemeId,
-      ledger,
-      batchSize: config.batchSize
-    },
-    type: db.sequelize.QueryTypes.SELECT,
-    transaction,
-    raw: true
+    schemeId,
+    ledger,
+    batchSize: config.batchSize
   })
 
   const nextPendingPillar = queue[0] ? queue[0].pillar : null
@@ -83,10 +78,10 @@ const getAndIncrementSequence = async (schemeId, ledger, transaction) => {
 }
 
 const getSequence = async (schemeId, transaction) => {
-  return db.sequence.findByPk(schemeId, {
-    transaction,
-    lock: true
-  })
+  return (await db.sequence(transaction)
+    .where({ schemeId })
+    .forUpdate()
+    .first()) ?? null
 }
 
 const incrementSequence = (currentSequence) => {
@@ -95,37 +90,29 @@ const incrementSequence = (currentSequence) => {
 }
 
 const updateSequence = async (sequence, transaction) => {
-  await db.sequence.update({
-    nextAP: sequence.nextAP,
-    nextAR: sequence.nextAR
-  }, {
-    where: { schemeId: sequence.schemeId },
-    transaction
-  })
+  await db.sequence(transaction)
+    .where({ schemeId: sequence.schemeId })
+    .update({
+      nextAP: sequence.nextAP,
+      nextAR: sequence.nextAR
+    })
 }
 
 const createNewBatch = async (schemeId, ledger, sequence, created, transaction) => {
-  return db.batch.create({ schemeId, ledger, sequence, created }, { transaction })
+  const [batch] = await db.batch(transaction)
+    .insert({ schemeId, ledger, sequence, created })
+    .returning('batchId')
+  return batch
 }
 
 const updatePaymentRequests = async (paymentRequests, batchId, transaction) => {
   const paymentRequestIds = paymentRequests.map(x => x.paymentRequestId)
-  await db.paymentRequest.update({ batchId }, {
-    where: {
-      paymentRequestId: {
-        [db.Sequelize.Op.in]: paymentRequestIds
-      }
-    },
-    transaction
-  })
-  await db.queue.update({ batchId }, {
-    where: {
-      paymentRequestId: {
-        [db.Sequelize.Op.in]: paymentRequests.map(x => x.paymentRequestId)
-      }
-    },
-    transaction
-  })
+  await db.paymentRequest(transaction)
+    .whereIn('paymentRequestId', paymentRequestIds)
+    .update({ batchId })
+  await db.queue(transaction)
+    .whereIn('paymentRequestId', paymentRequestIds)
+    .update({ batchId })
 }
 
 module.exports = allocateToBatches

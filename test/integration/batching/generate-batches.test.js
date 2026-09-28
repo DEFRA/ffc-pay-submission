@@ -20,7 +20,8 @@ jest.mock('ffc-pay-event-publisher', () => ({
   }))
 }))
 
-const db = require('../../../app/data')
+const db = require('../../../app/database')
+const { truncate } = require('../../helpers/truncate')
 const { AP } = require('../../../app/constants/ledgers')
 const generateBatches = require('../../../app/batching/generate-batches')
 
@@ -33,7 +34,7 @@ let batchProperties
 describe('generate batches', () => {
   beforeEach(async () => {
     jest.clearAllMocks()
-    await db.sequelize.truncate({ cascade: true })
+    await truncate()
 
     scheme = { schemeId: 1, name: 'SFI' }
 
@@ -69,23 +70,23 @@ describe('generate batches', () => {
   })
 
   afterAll(async () => {
-    await db.sequelize.truncate({ cascade: true })
-    await db.sequelize.close()
+    await truncate()
+    await db.close()
   })
 
   const setup = async () => {
-    await db.scheme.create(scheme)
-    await db.batchProperties.create(batchProperties)
-    await db.batch.create(batch)
-    await db.paymentRequest.create(paymentRequest)
-    await db.invoiceLine.create(invoiceLine)
+    await db.scheme().insert(scheme)
+    await db.batchProperties().insert(batchProperties)
+    await db.batch().insert(batch)
+    await db.paymentRequest().insert(paymentRequest)
+    await db.invoiceLine().insert(invoiceLine)
     await generateBatches()
   }
 
   test('publishes batch', async () => {
     await setup()
 
-    const result = await db.batch.findByPk(batch.batchId)
+    const result = await db.batch().where({ batchId: batch.batchId }).first()
     expect(result.published).not.toBeNull()
   })
 

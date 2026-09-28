@@ -1,6 +1,20 @@
-const db = require('../data')
+const db = require('../database')
 const moment = require('moment')
 const getBatchQuery = require('../constants/get-batch-query')
+
+const invoiceLineColumns = [
+  'invoiceLineId',
+  'paymentRequestId',
+  'schemeCode',
+  'accountCode',
+  'fundCode',
+  'agreementNumber',
+  'description',
+  'value',
+  'convergence',
+  'deliveryBody',
+  'marketingYear'
+]
 
 const getBatches = async (transaction, started = new Date()) => {
   if (!transaction) {
@@ -19,12 +33,8 @@ const getBatches = async (transaction, started = new Date()) => {
 const getPendingBatches = async (started, transaction) => {
   const batchProcessingDelayMinutes = 5
   // Get one batch ID per scheme
-  const batchIdRows = await db.sequelize.query(getBatchQuery, {
-    replacements: {
-      delay: moment(started).subtract(batchProcessingDelayMinutes, 'minutes').toDate()
-    },
-    transaction,
-    type: db.Sequelize.QueryTypes.SELECT
+  const { rows: batchIdRows } = await transaction.raw(getBatchQuery, {
+    delay: moment(started).subtract(batchProcessingDelayMinutes, 'minutes').toDate()
   })
 
   const batchIds = batchIdRows.map(r => r.batchId)
@@ -34,40 +44,15 @@ const getPendingBatches = async (started, transaction) => {
   }
 
   // Fetch full batch rows with FOR UPDATE
-  const batches = await db.batch.findAll({
-    where: { batchId: batchIds },
-    transaction,
-    lock: transaction.LOCK.UPDATE,
-    raw: true
-  })
+  const batches = await db.batch(transaction)
+    .whereIn('batchId', batchIds)
+    .forUpdate()
 
   // Fetch payment requests with invoice lines
-  const paymentRequests = await db.paymentRequest.findAll({
-    transaction,
-    include: [{
-      model: db.invoiceLine,
-      as: 'invoiceLines',
-      required: true
-    }],
-    where: {
-      batchId: batchIds
-    }
-  })
+  const paymentRequests = await getPaymentRequestsWithInvoiceLines(batchIds, transaction)
 
   // Fetch schemes with batch properties
-  const schemes = await db.scheme.findAll({
-    transaction,
-    include: [{
-      model: db.batchProperties,
-      as: 'batchProperties',
-      required: true
-    }],
-    where: {
-      schemeId: {
-        [db.Sequelize.Op.in]: paymentRequests.map(x => x.schemeId)
-      }
-    }
-  })
+  const schemes = await getSchemesWithBatchProperties(paymentRequests.map(x => x.schemeId), transaction)
 
   // Skip batches without a matching scheme (or transaction will fail for all)
   return batches
@@ -79,21 +64,49 @@ const getPendingBatches = async (started, transaction) => {
 
       return {
         ...batch,
-        paymentRequests: paymentRequests
-          .filter(pr => pr.batchId === batch.batchId)
-          .map(pr => pr.get({ plain: true })),
-        scheme: scheme.get({ plain: true })
+        paymentRequests: paymentRequests.filter(pr => pr.batchId === batch.batchId),
+        scheme
       }
     })
     .filter(Boolean)
 }
 
+const getPaymentRequestsWithInvoiceLines = async (batchIds, transaction) => {
+  const paymentRequests = await db.paymentRequest(transaction)
+    .whereIn('batchId', batchIds)
+    .orderBy('paymentRequestId', 'asc')
+  const invoiceLines = await db.invoiceLine(transaction)
+    .select(invoiceLineColumns)
+    .whereIn('paymentRequestId', paymentRequests.map(x => x.paymentRequestId))
+    .orderBy('invoiceLineId', 'asc')
+
+  // invoice lines were a required include, so a payment request without a line is not returned
+  return paymentRequests
+    .map(paymentRequest => ({
+      ...paymentRequest,
+      invoiceLines: invoiceLines.filter(x => x.paymentRequestId === paymentRequest.paymentRequestId)
+    }))
+    .filter(paymentRequest => paymentRequest.invoiceLines.length > 0)
+}
+
+const getSchemesWithBatchProperties = async (schemeIds, transaction) => {
+  const schemes = await db.scheme(transaction).whereIn('schemeId', schemeIds)
+  const batchProperties = await db.batchProperties(transaction).whereIn('schemeId', schemeIds)
+
+  // batch properties were a required include, so a scheme without them is not returned
+  return schemes
+    .map(scheme => ({
+      ...scheme,
+      batchProperties: batchProperties.find(x => x.schemeId === scheme.schemeId)
+    }))
+    .filter(scheme => scheme.batchProperties)
+}
+
 const updateStarted = async (batches, started, transaction) => {
   for (const batch of batches) {
-    await db.batch.update({ started }, {
-      where: { batchId: batch.batchId },
-      transaction
-    })
+    await db.batch(transaction)
+      .where({ batchId: batch.batchId })
+      .update({ started })
   }
 }
 

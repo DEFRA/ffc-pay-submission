@@ -1,10 +1,11 @@
-const { removeAgreementData } = require('../../../app/retention')
-const db = require('../../../app/data')
+const { createKnexMock } = require('../../helpers/mock-knex')
 
-jest.mock('../../../app/data', () => ({
-  sequelize: {
-    transaction: jest.fn()
-  }
+const mockDb = createKnexMock()
+
+jest.mock('../../../app/database', () => ({
+  client: mockDb.knex,
+  transaction: mockDb.transaction,
+  close: mockDb.close
 }))
 
 jest.mock('../../../app/retention/find-payment-requests', () => ({
@@ -27,6 +28,7 @@ const { findPaymentRequests } = require('../../../app/retention/find-payment-req
 const { removeQueues } = require('../../../app/retention/remove-queues')
 const { removeInvoiceLines } = require('../../../app/retention/remove-invoice-lines')
 const { removePaymentRequests } = require('../../../app/retention/remove-payment-requests')
+const { removeAgreementData } = require('../../../app/retention')
 
 describe('removeAgreementData', () => {
   const retentionData = {
@@ -40,11 +42,7 @@ describe('removeAgreementData', () => {
   beforeEach(() => {
     jest.clearAllMocks()
 
-    transaction = {
-      commit: jest.fn().mockResolvedValue(),
-      rollback: jest.fn().mockResolvedValue()
-    }
-    db.sequelize.transaction.mockResolvedValue(transaction)
+    transaction = mockDb.trx
   })
 
   test('commits transaction and returns early if no payment requests found', async () => {
@@ -54,7 +52,7 @@ describe('removeAgreementData', () => {
 
     await removeAgreementData(retentionData)
 
-    expect(db.sequelize.transaction).toHaveBeenCalledTimes(1)
+    expect(mockDb.transaction).toHaveBeenCalledTimes(1)
     expect(findPaymentRequests).toHaveBeenCalledWith(
       retentionData.agreementNumber,
       retentionData.frn,
@@ -87,7 +85,7 @@ describe('removeAgreementData', () => {
 
     const paymentRequestIds = paymentRequests.map(pr => pr.paymentRequestId)
 
-    expect(db.sequelize.transaction).toHaveBeenCalledTimes(1)
+    expect(mockDb.transaction).toHaveBeenCalledTimes(1)
     expect(findPaymentRequests).toHaveBeenCalledWith(
       retentionData.agreementNumber,
       retentionData.frn,

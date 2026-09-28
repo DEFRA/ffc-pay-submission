@@ -1,4 +1,5 @@
-const db = require('../../../app/data')
+const db = require('../../../app/database')
+const { truncate } = require('../../helpers/truncate')
 const getFilename = require('../../../app/batching/get-filename')
 const { AP, AR } = require('../../../app/constants/ledgers')
 const { MANUAL } = require('../../../app/constants/schemes')
@@ -9,7 +10,7 @@ let pillar
 
 describe('get filename', () => {
   beforeEach(async () => {
-    await db.sequelize.truncate({ cascade: true })
+    await truncate()
 
     batch = {
       ledger: AP,
@@ -26,8 +27,8 @@ describe('get filename', () => {
   })
 
   afterAll(async () => {
-    await db.sequelize.truncate({ cascade: true })
-    await db.sequelize.close()
+    await truncate()
+    await db.close()
   })
 
   test('should return filename for sequence 1', async () => {
