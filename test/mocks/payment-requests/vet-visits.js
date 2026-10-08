@@ -1,6 +1,8 @@
-const { VET_VISITS } = require('../../../app/constants/schemes')
-const { VET_VISITS_INVOICE_NUMBER } = require('../values/invoice-number')
+const { getSchemeIds } = require('ffc-pay-schemes')
 const paymentRequest = require('./payment-request')
+const { VET_VISITS_INVOICE_NUMBER } = require('../values/invoice-number')
+
+const { VET_VISITS } = getSchemeIds()
 
 module.exports = {
   ...paymentRequest,

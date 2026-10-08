@@ -1,4 +1,6 @@
-const { ES } = require('../../constants/schemes')
+const { getSchemeIds } = require('ffc-pay-schemes')
+
+const { ES } = getSchemeIds()
 
 const getContractNumber = (schemeId, contractNumber, invoiceNumber) => {
   if (schemeId === ES) {

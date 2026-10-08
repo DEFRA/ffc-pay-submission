@@ -1,8 +1,10 @@
+const { getSchemeIds, getPillars } = require('ffc-pay-schemes')
 const db = require('../../../app/data')
 const getFilename = require('../../../app/batching/get-filename')
 const { AP, AR } = require('../../../app/constants/ledgers')
-const { MANUAL } = require('../../../app/constants/schemes')
-const { SFI } = require('../../../app/constants/pillars')
+
+const { MANUAL } = getSchemeIds()
+const { SFI } = getPillars()
 
 let batch
 let pillar

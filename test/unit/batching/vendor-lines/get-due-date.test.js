@@ -1,6 +1,8 @@
+const { getSchemeIds } = require('ffc-pay-schemes')
 const { DUE_DATE } = require('../../../mocks/values/due-date')
-const { ES, IMPS, SFI } = require('../../../../app/constants/schemes')
 const { getDueDate } = require('../../../../app/batching/vendor-lines/get-due-date')
+
+const { ES, IMPS, SFI } = getSchemeIds()
 
 describe('get due date', () => {
   test.each([

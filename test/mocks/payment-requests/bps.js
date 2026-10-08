@@ -1,6 +1,8 @@
-const { BPS } = require('../../../app/constants/schemes')
-const { BPS_INVOICE_NUMBER } = require('../values/invoice-number')
+const { getSchemeIds } = require('ffc-pay-schemes')
 const paymentRequest = require('./payment-request')
+const { BPS_INVOICE_NUMBER } = require('../values/invoice-number')
+
+const { BPS } = getSchemeIds()
 
 module.exports = {
   ...paymentRequest,

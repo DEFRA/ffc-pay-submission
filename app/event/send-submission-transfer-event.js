@@ -1,5 +1,5 @@
-const config = require('../config')
 const { EventPublisher } = require('ffc-pay-event-publisher')
+const config = require('../config')
 const { SOURCE } = require('../constants/source')
 const { BATCH_CREATED } = require('../constants/events')
 

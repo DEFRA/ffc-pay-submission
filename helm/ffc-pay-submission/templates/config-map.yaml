@@ -6,6 +6,7 @@ data:
   OTEL_SERVICE_NAME: {{ quote .Values.name }} 
   MESSAGE_QUEUE_HOST: {{ quote .Values.container.messageQueueHost }}
   PROCESSING_ACTIVE: {{ quote .Values.container.processingActive }}
+  USE_V2_FRPS_JOURNALS: {{ quote .Values.container.useV2FRPSJournals }}
   {{- if (.Values.environmentCode) }}
   PAYMENTSUBMIT_TOPIC_ADDRESS: {{ .Values.container.paymentSubmitTopicAddress }}-{{ .Values.environmentCode }}
   RETENTION_TOPIC_ADDRESS: {{ .Values.container.retentionTopicAddress }}-{{ .Values.environmentCode }}

@@ -1,6 +1,8 @@
-const { LUMP_SUMS } = require('../../../app/constants/schemes')
-const { LUMP_SUMS_INVOICE_NUMBER } = require('../values/invoice-number')
+const { getSchemeIds } = require('ffc-pay-schemes')
 const paymentRequest = require('./payment-request')
+const { LUMP_SUMS_INVOICE_NUMBER } = require('../values/invoice-number')
+
+const { LUMP_SUMS } = getSchemeIds()
 
 module.exports = {
   ...paymentRequest,

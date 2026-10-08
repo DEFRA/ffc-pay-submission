@@ -34,6 +34,7 @@ services:
       BATCH_INTERVAL: 10000
       USE_V2_RETURN_FILES: ${USE_V2_RETURN_FILES}
       PROCESSING_ACTIVE: ${PROCESSING_ACTIVE:-true}
+      USE_V2_FRPS_JOURNALS: ${USE_V2_FRPS_JOURNALS:-true}
   
   ffc-pay-submission-postgres:
     image: postgres:11.4-alpine

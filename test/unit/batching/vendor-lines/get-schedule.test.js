@@ -1,6 +1,8 @@
+const { getPillars } = require('ffc-pay-schemes')
 const { Q1, Q4 } = require('../../../../app/constants/schedules')
-const { SFI, SFI23 } = require('../../../../app/constants/pillars')
 const { getSchedule } = require('../../../../app/batching/vendor-lines/get-schedule')
+
+const { SFI, SFI23 } = getPillars()
 
 describe('get schedule', () => {
   test('returns provided schedule if present', () => {

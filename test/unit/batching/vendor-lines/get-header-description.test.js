@@ -1,5 +1,7 @@
-const { FC } = require('../../../../app/constants/schemes')
+const { getSchemeIds } = require('ffc-pay-schemes')
 const { getHeaderDescription } = require('../../../../app/batching/vendor-lines/get-header-description')
+
+const { FC } = getSchemeIds()
 
 let paymentRequest
 

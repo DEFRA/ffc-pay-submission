@@ -1,7 +1,7 @@
+const { getSchemeIds, getSchemeProperties } = require('ffc-pay-schemes')
 const allocateToBatch = require('../../../app/batching/allocate-to-batches')
 const db = require('../../../app/data')
 const { AP, AR } = require('../../../app/constants/ledgers')
-const { SFI, SFI23 } = require('../../../app/constants/pillars')
 
 let scheme
 let paymentRequest
@@ -9,18 +9,22 @@ let invoiceLine
 let sequence
 let queue
 
+const { SFI, SFI23 } = getSchemeIds()
+const sfiScheme = getSchemeProperties(SFI)
+const sfi23Scheme = getSchemeProperties(SFI23)
+
 describe('allocate to batch', () => {
   beforeEach(async () => {
     await db.sequelize.truncate({ cascade: true })
 
     scheme = {
-      schemeId: 1,
-      name: 'SFI'
+      schemeId: sfiScheme.schemeId,
+      name: sfiScheme.schemeName
     }
 
     paymentRequest = {
       paymentRequestId: 1,
-      schemeId: 1,
+      schemeId: sfiScheme.schemeId,
       frn: 1234567890,
       marketingYear: 2022,
       ledger: AP
@@ -32,7 +36,7 @@ describe('allocate to batch', () => {
     }
 
     sequence = {
-      schemeId: 1,
+      schemeId: sfiScheme.schemeId,
       nextAP: 5,
       nextAR: 3
     }
@@ -231,7 +235,7 @@ describe('allocate to batch', () => {
     await db.paymentRequest.create(paymentRequest)
     await db.invoiceLine.create(invoiceLine)
     await db.queue.create(queue)
-    paymentRequest.pillar = SFI
+    paymentRequest.pillar = sfiScheme.pillar
     paymentRequest.paymentRequestId = 2
     invoiceLine.paymentRequestId = 2
     invoiceLine.invoiceLineId = 2
@@ -248,11 +252,11 @@ describe('allocate to batch', () => {
   test('should not include different pillars in same batch', async () => {
     await db.scheme.create(scheme)
     await db.sequence.create(sequence)
-    paymentRequest.pillar = SFI23
+    paymentRequest.pillar = sfi23Scheme.pillar
     await db.paymentRequest.create(paymentRequest)
     await db.invoiceLine.create(invoiceLine)
     await db.queue.create(queue)
-    paymentRequest.pillar = SFI
+    paymentRequest.pillar = sfiScheme.pillar
     paymentRequest.paymentRequestId = 2
     invoiceLine.paymentRequestId = 2
     invoiceLine.invoiceLineId = 2
@@ -269,7 +273,7 @@ describe('allocate to batch', () => {
   test('should include same pillar in same batch', async () => {
     await db.scheme.create(scheme)
     await db.sequence.create(sequence)
-    paymentRequest.pillar = SFI
+    paymentRequest.pillar = sfiScheme.pillar
     await db.paymentRequest.create(paymentRequest)
     await db.invoiceLine.create(invoiceLine)
     await db.queue.create(queue)

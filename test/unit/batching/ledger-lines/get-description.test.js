@@ -1,5 +1,7 @@
+const { getSchemeIds } = require('ffc-pay-schemes')
 const { getDescription } = require('../../../../app/batching/ledger-lines/get-description')
-const { BPS } = require('../../../../app/constants/schemes')
+
+const { BPS } = getSchemeIds()
 
 const otherScheme = 'OTHER'
 const MAX_DESCRIPTION_LENGTH = 60

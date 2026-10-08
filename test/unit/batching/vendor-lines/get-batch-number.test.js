@@ -1,5 +1,7 @@
-const { ES, SFI, FC, IMPS } = require('../../../../app/constants/schemes')
+const { getSchemeIds } = require('ffc-pay-schemes')
 const { getBatchNumber } = require('../../../../app/batching/vendor-lines/get-batch-number')
+
+const { ES, SFI, FC, IMPS } = getSchemeIds()
 
 describe('get batch number', () => {
   beforeEach(() => {

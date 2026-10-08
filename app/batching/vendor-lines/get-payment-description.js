@@ -1,4 +1,6 @@
-const { BPS, ES, FC, IMPS } = require('../../constants/schemes')
+const { getSchemeIds } = require('ffc-pay-schemes')
+
+const { BPS, ES, FC, IMPS } = getSchemeIds()
 
 const getPaymentDescription = (schemeId) => {
   switch (schemeId) {
@@ -9,7 +11,7 @@ const getPaymentDescription = (schemeId) => {
     case IMPS:
       return 'PAY'
     default:
-      return 1
+      return '1'
   }
 }
 

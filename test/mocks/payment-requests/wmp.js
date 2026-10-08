@@ -1,6 +1,8 @@
-const { WMP } = require('../../../app/constants/schemes')
-const { WMP_INVOICE_NUMBER } = require('../values/invoice-number')
+const { getSchemeIds } = require('ffc-pay-schemes')
 const paymentRequest = require('./payment-request')
+const { WMP_INVOICE_NUMBER } = require('../values/invoice-number')
+
+const { WMP } = getSchemeIds()
 
 module.exports = {
   ...paymentRequest,

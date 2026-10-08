@@ -1,5 +1,8 @@
+const { getSchemeIds } = require('ffc-pay-schemes')
 const { AP } = require('../../app/constants/ledgers')
-const { SFI } = require('../../app/constants/pillars')
+
+const { SFI } = getSchemeIds()
+
 module.exports = {
   sequence: 1,
   ledger: AP,

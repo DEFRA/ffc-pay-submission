@@ -61,7 +61,7 @@ describe('process payment message (new fields)', () => {
       frn: 111122223333,
       fesCode: 'FES-ABC',
       annualValue: '9876543210.12',
-      remmittanceDescription: 'Quarterly payment'
+      remittanceDescription: 'Quarterly payment'
     }
     const message = { body }
     const receiver = { completeMessage: jest.fn() }
@@ -97,7 +97,7 @@ describe('process payment message (new fields)', () => {
         frn: 1234567890,
         fesCode: 'FES-ERR',
         annualValue: '100.00',
-        remmittanceDescription: 'Should fail'
+        remittanceDescription: 'Should fail'
       }
     }
     const receiver = { completeMessage: jest.fn() }
@@ -115,7 +115,7 @@ describe('process payment message (new fields)', () => {
       frn: 999888777666,
       fesCode: 'FES-IMMUT',
       annualValue: '123.45',
-      remmittanceDescription: 'Immutability check'
+      remittanceDescription: 'Immutability check'
     })
     const message = { body: originalBody }
     const receiver = { completeMessage: jest.fn() }
