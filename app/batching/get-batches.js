@@ -78,7 +78,6 @@ const getPaymentRequestsWithInvoiceLines = async (batchIds, transaction) => {
     .select(invoiceLineColumns)
     .whereIn('paymentRequestId', paymentRequests.map(x => x.paymentRequestId))
 
-  // invoice lines were a required include, so a payment request without a line is not returned
   return paymentRequests
     .map(paymentRequest => ({
       ...paymentRequest,
@@ -91,7 +90,6 @@ const getSchemesWithBatchProperties = async (schemeIds, transaction) => {
   const schemes = await db.scheme(transaction).whereIn('schemeId', schemeIds)
   const batchProperties = await db.batchProperties(transaction).whereIn('schemeId', schemeIds)
 
-  // batch properties were a required include, so a scheme without them is not returned
   return schemes
     .map(scheme => ({
       ...scheme,
