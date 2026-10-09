@@ -3,17 +3,15 @@ jest.mock('ffc-pay-schemes', () => ({
   getSchemeBatchProperties: jest.fn()
 }))
 
-jest.mock('../../app/data', () => ({
-  scheme: {
-    findOne: jest.fn(),
-    upsert: jest.fn()
-  },
-  batchProperties: {
-    upsert: jest.fn()
-  },
-  sequence: {
-    create: jest.fn()
-  }
+const { createKnexMock, createQueryBuilder } = require('../helpers/mock-knex')
+
+const mockDb = createKnexMock(['scheme', 'batchProperties', 'sequence'])
+
+jest.mock('../../app/database', () => ({
+  client: mockDb.knex,
+  transaction: mockDb.transaction,
+  close: mockDb.close,
+  ...mockDb.tables
 }))
 
 const {
@@ -21,13 +19,33 @@ const {
   getSchemeBatchProperties
 } = require('ffc-pay-schemes')
 
-const db = require('../../app/data')
 const { updateSchemesDatabase } = require('../../app/update-schemes-database')
+
+let schemeLookup
+let schemeUpsert
+let batchPropertiesUpsert
+let sequenceInsert
+
+const mockExistingScheme = (existingScheme) => {
+  schemeLookup.resolves(existingScheme)
+}
 
 describe('updateSchemesDatabase', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     jest.spyOn(console, 'log').mockImplementation()
+
+    schemeLookup = createQueryBuilder()
+    schemeUpsert = createQueryBuilder()
+    batchPropertiesUpsert = createQueryBuilder()
+    sequenceInsert = createQueryBuilder()
+
+    mockDb.tables.scheme.mockImplementation(() => {
+      const calls = mockDb.tables.scheme.mock.calls.length
+      return calls % 2 === 1 ? schemeLookup : schemeUpsert
+    })
+    mockDb.tables.batchProperties.mockReturnValue(batchPropertiesUpsert)
+    mockDb.tables.sequence.mockReturnValue(sequenceInsert)
   })
 
   afterEach(() => {
@@ -45,32 +63,35 @@ describe('updateSchemesDatabase', () => {
       source: 'SFI Source'
     })
 
-    db.scheme.findOne.mockResolvedValue({
+    mockExistingScheme({
       schemeId: 1,
       name: 'Sustainable Farming Incentive'
     })
 
     await updateSchemesDatabase()
 
-    expect(db.scheme.findOne).toHaveBeenCalledWith({
-      where: { schemeId: 1 }
-    })
+    expect(schemeLookup.where).toHaveBeenCalledWith({ schemeId: 1 })
+    expect(schemeLookup.first).toHaveBeenCalledTimes(1)
 
-    expect(db.scheme.upsert).toHaveBeenCalledWith({
+    expect(schemeUpsert.insert).toHaveBeenCalledWith({
       schemeId: 1,
       name: 'Sustainable Farming Incentive'
     })
+    expect(schemeUpsert.onConflict).toHaveBeenCalledWith('schemeId')
+    expect(schemeUpsert.merge).toHaveBeenCalledTimes(1)
 
     expect(getSchemeBatchProperties).toHaveBeenCalledWith(1)
 
-    expect(db.batchProperties.upsert).toHaveBeenCalledWith({
+    expect(batchPropertiesUpsert.onConflict).toHaveBeenCalledWith('schemeId')
+    expect(batchPropertiesUpsert.merge).toHaveBeenCalledTimes(1)
+    expect(batchPropertiesUpsert.insert).toHaveBeenCalledWith({
       schemeId: 1,
       prefix: 'SFI Prefix',
       suffix: 'SFI Suffix',
       source: 'SFI Source'
     })
 
-    expect(db.sequence.create).not.toHaveBeenCalled()
+    expect(mockDb.tables.sequence).not.toHaveBeenCalled()
   })
 
   test('creates a sequence for a newly created scheme', async () => {
@@ -84,27 +105,30 @@ describe('updateSchemesDatabase', () => {
       source: 'SFI Source'
     })
 
-    db.scheme.findOne.mockResolvedValue(null)
+    mockExistingScheme(undefined)
 
     await updateSchemesDatabase()
 
-    expect(db.scheme.findOne).toHaveBeenCalledWith({
-      where: { schemeId: 1 }
-    })
+    expect(schemeLookup.where).toHaveBeenCalledWith({ schemeId: 1 })
+    expect(schemeLookup.first).toHaveBeenCalledTimes(1)
 
-    expect(db.scheme.upsert).toHaveBeenCalledWith({
+    expect(schemeUpsert.insert).toHaveBeenCalledWith({
       schemeId: 1,
       name: 'Sustainable Farming Incentive'
     })
+    expect(schemeUpsert.onConflict).toHaveBeenCalledWith('schemeId')
+    expect(schemeUpsert.merge).toHaveBeenCalledTimes(1)
 
-    expect(db.batchProperties.upsert).toHaveBeenCalledWith({
+    expect(batchPropertiesUpsert.onConflict).toHaveBeenCalledWith('schemeId')
+    expect(batchPropertiesUpsert.merge).toHaveBeenCalledTimes(1)
+    expect(batchPropertiesUpsert.insert).toHaveBeenCalledWith({
       schemeId: 1,
       prefix: 'SFI Prefix',
       suffix: 'SFI Suffix',
       source: 'SFI Source'
     })
 
-    expect(db.sequence.create).toHaveBeenCalledWith({
+    expect(sequenceInsert.insert).toHaveBeenCalledWith({
       schemeId: 1,
       nextAP: 1,
       nextAR: 1
@@ -129,14 +153,14 @@ describe('updateSchemesDatabase', () => {
         source: 'SOURCE'
       })
 
-    db.scheme.findOne.mockResolvedValue({})
+    mockExistingScheme({})
 
     await updateSchemesDatabase()
 
-    expect(db.scheme.findOne).toHaveBeenCalledTimes(2)
-    expect(db.scheme.upsert).toHaveBeenCalledTimes(2)
-    expect(db.batchProperties.upsert).toHaveBeenCalledTimes(2)
+    expect(schemeLookup.first).toHaveBeenCalledTimes(2)
+    expect(schemeUpsert.merge).toHaveBeenCalledTimes(2)
+    expect(batchPropertiesUpsert.merge).toHaveBeenCalledTimes(2)
     expect(getSchemeBatchProperties).toHaveBeenCalledTimes(2)
-    expect(db.sequence.create).not.toHaveBeenCalled()
+    expect(mockDb.tables.sequence).not.toHaveBeenCalled()
   })
 })

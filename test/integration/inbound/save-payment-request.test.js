@@ -7,30 +7,28 @@ jest.mock('ffc-pay-event-publisher', () => ({
   }))
 }))
 
-const db = require('../../../app/data')
+const db = require('../../../app/database')
+const { truncate } = require('../../helpers/truncate')
 const savePaymentRequest = require('../../../app/inbound')
 
 let scheme
 let paymentRequest
 
 const createPaymentRequestRow = async (where) => {
-  const rows = await db.paymentRequest.findAll({ where })
+  const rows = await db.paymentRequest().where(where)
   return rows[0]
 }
 
 const createInvoiceLinesRows = async () => {
-  return db.invoiceLine.findAll({
-    include: [{
-      model: db.paymentRequest,
-      as: 'paymentRequest',
-      required: true
-    }]
-  })
+  return db.invoiceLine()
+    .select('invoiceLines.*')
+    .join('paymentRequests', 'paymentRequests.paymentRequestId', 'invoiceLines.paymentRequestId')
+    .orderBy('invoiceLines.invoiceLineId')
 }
 
 describe('save payment requests', () => {
   beforeEach(async () => {
-    await db.sequelize.truncate({ cascade: true })
+    await truncate()
 
     scheme = { schemeId: 1, name: 'SFI' }
     paymentRequest = {
@@ -67,12 +65,12 @@ describe('save payment requests', () => {
       ]
     }
 
-    await db.scheme.create(scheme)
+    await db.scheme().insert(scheme)
   })
 
   afterAll(async () => {
-    await db.sequelize.truncate({ cascade: true })
-    await db.sequelize.close()
+    await truncate()
+    await db.close()
   })
 
   test('should return payment request header data', async () => {
@@ -110,7 +108,7 @@ describe('save payment requests', () => {
   test('should save referenceId if provided', async () => {
     paymentRequest.referenceId = randomUUID()
     await savePaymentRequest(paymentRequest)
-    const rows = await db.paymentRequest.findAll({ where: { referenceId: paymentRequest.referenceId } })
+    const rows = await db.paymentRequest().where({ referenceId: paymentRequest.referenceId })
     expect(rows).toHaveLength(1)
   })
 
@@ -128,7 +126,7 @@ describe('save payment requests', () => {
     modify()
     await savePaymentRequest(paymentRequest)
 
-    const rows = await db.paymentRequest.findAll({ where: { invoiceNumber: paymentRequest.invoiceNumber } })
+    const rows = await db.paymentRequest().where({ invoiceNumber: paymentRequest.invoiceNumber })
     expect(rows).toHaveLength(expected)
   })
 

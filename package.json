@@ -1,6 +1,6 @@
 {
   "name": "ffc-pay-submission",
-  "version": "1.31.1",
+  "version": "1.32.0",
   "description": "FFC payment submission service",
   "homepage": "https://github.com/DEFRA/ffc-pay-submission",
   "main": "app/index.js",
@@ -34,14 +34,13 @@
     "@azure/storage-blob": "12.31.0",
     "@fast-csv/format": "5.0.5",
     "@hapi/hapi": "21.4.8",
-    "ffc-database": "1.0.27",
+    "ffc-database": "2.0.0",
     "ffc-pay-event-publisher": "2.0.0",
     "ffc-pay-schemes": "1.1.1",
     "hapi-pino": "13.0.0",
     "joi": "18.2.9",
     "log-timestamp": "0.3.0",
-    "moment": "2.31.0",
-    "sequelize": "6.37.8"
+    "moment": "2.31.0"
   },
   "devDependencies": {
     "blipp": "4.0.2",
@@ -51,9 +50,6 @@
     "jest-junit": "17.0.0",
     "neostandard": "0.12.2",
     "nodemon": "3.0.1"
-  },
-  "overrides": {
-    "uuid": "11.1.1"
   },
   "nodemonConfig": {
     "ignore": [
