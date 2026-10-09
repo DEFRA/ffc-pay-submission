@@ -1,4 +1,5 @@
-const db = require('../../../app/data')
+const db = require('../../../app/database')
+const { truncate } = require('../../helpers/truncate')
 const completeBatch = require('../../../app/batching/complete-batch')
 const moment = require('moment')
 const { AP } = require('../../../app/constants/ledgers')
@@ -7,7 +8,7 @@ let batch
 
 describe('complete batch', () => {
   beforeEach(async () => {
-    await db.sequelize.truncate({ cascade: true })
+    await truncate()
 
     scheme = {
       schemeId: 1,
@@ -24,24 +25,24 @@ describe('complete batch', () => {
   })
 
   afterAll(async () => {
-    await db.sequelize.truncate({ cascade: true })
-    await db.sequelize.close()
+    await truncate()
+    await db.close()
   })
 
   test('should update published date if not already complete', async () => {
-    await db.scheme.create(scheme)
-    await db.batch.create(batch)
+    await db.scheme().insert(scheme)
+    await db.batch().insert(batch)
     await completeBatch(batch.batchId)
-    const batchResult = await db.batch.findByPk(batch.batchId)
+    const batchResult = await db.batch().where({ batchId: batch.batchId }).first()
     expect(batchResult.published).not.toBeNull()
   })
 
   test('should not update published date if already complete', async () => {
-    batch.published = moment().subtract(1, 'day')
-    await db.scheme.create(scheme)
-    await db.batch.create(batch)
+    batch.published = moment().subtract(1, 'day').toDate()
+    await db.scheme().insert(scheme)
+    await db.batch().insert(batch)
     await completeBatch(batch.batchId)
-    const batchResult = await db.batch.findByPk(batch.batchId)
-    expect(batchResult.published).toStrictEqual(batch.published.toDate())
+    const batchResult = await db.batch().where({ batchId: batch.batchId }).first()
+    expect(batchResult.published).toStrictEqual(batch.published)
   })
 })
