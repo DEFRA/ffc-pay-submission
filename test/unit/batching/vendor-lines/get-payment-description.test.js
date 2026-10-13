@@ -8,7 +8,7 @@ describe('get payment description', () => {
     { scheme: ES, expected: '' },
     { scheme: IMPS, expected: 'PAY' },
     { scheme: SFI, expected: '1' }
-  ])('returns $expected for $scheme scheme', ({ scheme, expected }) => {
+  ])('returns "$expected" for scheme $scheme', ({ scheme, expected }) => {
     expect(getPaymentDescription(scheme)).toBe(expected)
   })
 })
