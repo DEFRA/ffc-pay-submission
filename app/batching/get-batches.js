@@ -2,20 +2,6 @@ const db = require('../database')
 const moment = require('moment')
 const getBatchQuery = require('../constants/get-batch-query')
 
-const invoiceLineColumns = [
-  'invoiceLineId',
-  'paymentRequestId',
-  'schemeCode',
-  'accountCode',
-  'fundCode',
-  'agreementNumber',
-  'description',
-  'value',
-  'convergence',
-  'deliveryBody',
-  'marketingYear'
-]
-
 const getBatches = async (transaction, started = new Date()) => {
   if (!transaction) {
     throw new Error('getBatches must be called with a transaction')
@@ -75,7 +61,6 @@ const getPaymentRequestsWithInvoiceLines = async (batchIds, transaction) => {
   const paymentRequests = await db.paymentRequest(transaction)
     .whereIn('batchId', batchIds)
   const invoiceLines = await db.invoiceLine(transaction)
-    .select(invoiceLineColumns)
     .whereIn('paymentRequestId', paymentRequests.map(x => x.paymentRequestId))
 
   return paymentRequests
