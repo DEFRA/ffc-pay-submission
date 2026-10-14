@@ -1,11 +1,41 @@
 const TABLES = require('./tables')
 
 const PRIMARY_KEYS = {
+  [TABLES.batch]: 'batchId',
+  [TABLES.invoiceLine]: 'invoiceLineId',
   [TABLES.paymentRequest]: 'paymentRequestId',
-  [TABLES.invoiceLine]: 'invoiceLineId'
+  [TABLES.queue]: 'queueId'
 }
 
 const COLUMNS = {
+  [TABLES.batch]: [
+    'batchId',
+    'schemeId',
+    'ledger',
+    'sequence',
+    'created',
+    'started',
+    'published'
+  ],
+  [TABLES.batchProperties]: [
+    'schemeId',
+    'prefix',
+    'suffix',
+    'source'
+  ],
+  [TABLES.invoiceLine]: [
+    'invoiceLineId',
+    'paymentRequestId',
+    'schemeCode',
+    'accountCode',
+    'fundCode',
+    'agreementNumber',
+    'description',
+    'value',
+    'convergence',
+    'deliveryBody',
+    'marketingYear'
+  ],
   [TABLES.paymentRequest]: [
     'paymentRequestId',
     'schemeId',
@@ -45,26 +75,27 @@ const COLUMNS = {
     'remittanceDescription',
     'providesAccountingValues'
   ],
-  [TABLES.invoiceLine]: [
-    'invoiceLineId',
+  [TABLES.queue]: [
+    'queueId',
     'paymentRequestId',
-    'schemeCode',
-    'accountCode',
-    'fundCode',
-    'agreementNumber',
-    'description',
-    'value',
-    'convergence',
-    'deliveryBody',
-    'marketingYear'
+    'batchId'
+  ],
+  [TABLES.scheme]: [
+    'schemeId',
+    'name'
+  ],
+  [TABLES.sequence]: [
+    'schemeId',
+    'nextAP',
+    'nextAR'
   ]
 }
 
 const pickColumns = (record, table) => {
   return Object.fromEntries(
-    COLUMNS[table]
-      .filter(column => column !== PRIMARY_KEYS[table])
-      .map(column => [column, record[column]])
+    Object.entries(record)
+      .filter(([column]) => COLUMNS[table].includes(column))
+      .filter(([column]) => column !== PRIMARY_KEYS[table])
   )
 }
 
