@@ -1,29 +1,34 @@
-const saveInvoiceLines = require('../../../app/inbound/save-invoice-lines')
-const db = require('../../../app/data')
-const { sanitizeInvoiceLine } = require('../../../app/inbound/sanitize-invoice-line')
+const { createKnexMock } = require('../../helpers/mock-knex')
 
-jest.mock('../../../app/data')
+const mockDb = createKnexMock(['invoiceLine'])
+
+jest.mock('../../../app/database', () => ({
+  client: mockDb.knex,
+  transaction: mockDb.transaction,
+  close: mockDb.close,
+  ...mockDb.tables
+}))
+
 jest.mock('../../../app/inbound/sanitize-invoice-line')
+
+const saveInvoiceLines = require('../../../app/inbound/save-invoice-lines')
+const { sanitizeInvoiceLine } = require('../../../app/inbound/sanitize-invoice-line')
 
 describe('saveInvoiceLines', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockDb.builder.resolves()
   })
 
-  test('should save a single invoice line with paymentRequestId', async () => {
+  test('should save a single invoice line with paymentRequestId against the transaction', async () => {
     const invoiceLine = { invoiceLineId: '123', description: 'Test Item', value: 100 }
     const paymentRequestId = 'PR-001'
-    const transaction = {}
 
-    db.invoiceLine.create.mockResolvedValue({ id: 1, ...invoiceLine, paymentRequestId })
+    await saveInvoiceLines([invoiceLine], paymentRequestId, mockDb.trx)
 
-    await saveInvoiceLines([invoiceLine], paymentRequestId, transaction)
-
-    expect(db.invoiceLine.create).toHaveBeenCalledTimes(1)
-    expect(db.invoiceLine.create).toHaveBeenCalledWith(
-      { description: 'Test Item', value: 100, paymentRequestId },
-      { transaction }
-    )
+    expect(mockDb.tables.invoiceLine).toHaveBeenCalledWith(mockDb.trx)
+    expect(mockDb.builder.insert).toHaveBeenCalledTimes(1)
+    expect(mockDb.builder.insert).toHaveBeenCalledWith(expect.objectContaining({ description: 'Test Item', value: 100, paymentRequestId }))
   })
 
   test('should save multiple invoice lines', async () => {
@@ -31,28 +36,21 @@ describe('saveInvoiceLines', () => {
       { invoiceLineId: '1', description: 'Item 1', value: 50 },
       { invoiceLineId: '2', description: 'Item 2', value: 75 }
     ]
-    const paymentRequestId = 'PR-002'
-    const transaction = {}
 
-    db.invoiceLine.create.mockResolvedValue({})
+    await saveInvoiceLines(invoiceLines, 'PR-002', mockDb.trx)
 
-    await saveInvoiceLines(invoiceLines, paymentRequestId, transaction)
-
-    expect(db.invoiceLine.create).toHaveBeenCalledTimes(2)
+    expect(mockDb.builder.insert).toHaveBeenCalledTimes(2)
   })
 
   test('should remove invoiceLineId before saving', async () => {
     const invoiceLine = { invoiceLineId: 'should-be-deleted', description: 'Test' }
-    const paymentRequestId = 'PR-003'
-    const transaction = {}
 
-    db.invoiceLine.create.mockResolvedValue({})
+    await saveInvoiceLines([invoiceLine], 'PR-003', mockDb.trx)
 
-    await saveInvoiceLines([invoiceLine], paymentRequestId, transaction)
-
-    const callArgs = db.invoiceLine.create.mock.calls[0][0]
-    expect(callArgs).not.toHaveProperty('invoiceLineId')
-    expect(callArgs.description).toBe('Test')
+    const savedData = mockDb.builder.insert.mock.calls[0][0]
+    expect(savedData).not.toHaveProperty('invoiceLineId')
+    expect(invoiceLine).not.toHaveProperty('invoiceLineId')
+    expect(savedData.description).toBe('Test')
   })
 
   test('should sanitize each invoice line', async () => {
@@ -60,75 +58,68 @@ describe('saveInvoiceLines', () => {
       { invoiceLineId: '1', description: 'Item 1' },
       { invoiceLineId: '2', description: 'Item 2' }
     ]
-    const paymentRequestId = 'PR-004'
-    const transaction = {}
 
-    db.invoiceLine.create.mockResolvedValue({})
-
-    await saveInvoiceLines(invoiceLines, paymentRequestId, transaction)
+    await saveInvoiceLines(invoiceLines, 'PR-004', mockDb.trx)
 
     expect(sanitizeInvoiceLine).toHaveBeenCalledTimes(2)
     expect(sanitizeInvoiceLine).toHaveBeenCalledWith(expect.objectContaining({ description: 'Item 1' }))
     expect(sanitizeInvoiceLine).toHaveBeenCalledWith(expect.objectContaining({ description: 'Item 2' }))
   })
 
-  test('should pass transaction to database create method', async () => {
-    const invoiceLine = { invoiceLineId: '1', description: 'Test' }
-    const paymentRequestId = 'PR-005'
-    const transaction = { id: 'transaction-123' }
+  test('should run on the pool if no transaction provided', async () => {
+    await saveInvoiceLines([{ description: 'Test' }], 'PR-005')
 
-    db.invoiceLine.create.mockResolvedValue({})
+    expect(mockDb.tables.invoiceLine).toHaveBeenCalledWith(undefined)
+  })
 
-    await saveInvoiceLines([invoiceLine], paymentRequestId, transaction)
+  test('should run on the pool if transaction is null', async () => {
+    await saveInvoiceLines([{ description: 'Test' }], 'PR-005', null)
 
-    expect(db.invoiceLine.create).toHaveBeenCalledWith(
-      expect.any(Object),
-      { transaction }
-    )
+    expect(mockDb.tables.invoiceLine).toHaveBeenCalledWith(undefined)
   })
 
   test('should handle empty invoice lines array', async () => {
-    const paymentRequestId = 'PR-006'
-    const transaction = {}
+    await saveInvoiceLines([], 'PR-006', mockDb.trx)
 
-    await saveInvoiceLines([], paymentRequestId, transaction)
-
-    expect(db.invoiceLine.create).not.toHaveBeenCalled()
+    expect(mockDb.builder.insert).not.toHaveBeenCalled()
   })
 
-  test('should throw error if database create fails', async () => {
-    const invoiceLine = { invoiceLineId: '1', description: 'Test' }
-    const paymentRequestId = 'PR-007'
-    const transaction = {}
-    const error = new Error('Database error')
+  test('should throw error if database insert fails', async () => {
+    mockDb.builder.rejects(new Error('Database error'))
 
-    db.invoiceLine.create.mockRejectedValue(error)
-
-    await expect(saveInvoiceLines([invoiceLine], paymentRequestId, transaction)).rejects.toThrow('Database error')
+    await expect(saveInvoiceLines([{ description: 'Test' }], 'PR-007', mockDb.trx)).rejects.toThrow('Database error')
   })
 
-  test('should include all invoice line properties except invoiceLineId in created record', async () => {
+  test('should only save invoice line columns', async () => {
     const invoiceLine = {
       invoiceLineId: 'id-123',
+      schemeCode: '80001',
+      accountCode: 'SOS273',
+      fundCode: 'DRD10',
+      agreementNumber: 'SIP00000000000001',
       description: 'Test Item',
       value: 100,
+      convergence: false,
+      deliveryBody: 'RP00',
+      marketingYear: 2022,
       quantity: 2,
       customField: 'custom value'
     }
     const paymentRequestId = 'PR-008'
-    const transaction = {}
 
-    db.invoiceLine.create.mockResolvedValue({})
+    await saveInvoiceLines([invoiceLine], paymentRequestId, mockDb.trx)
 
-    await saveInvoiceLines([invoiceLine], paymentRequestId, transaction)
-
-    const savedData = db.invoiceLine.create.mock.calls[0][0]
-    expect(savedData).toEqual({
+    expect(mockDb.builder.insert).toHaveBeenCalledWith({
+      paymentRequestId,
+      schemeCode: '80001',
+      accountCode: 'SOS273',
+      fundCode: 'DRD10',
+      agreementNumber: 'SIP00000000000001',
       description: 'Test Item',
       value: 100,
-      quantity: 2,
-      customField: 'custom value',
-      paymentRequestId
+      convergence: false,
+      deliveryBody: 'RP00',
+      marketingYear: 2022
     })
   })
 })

@@ -10,7 +10,7 @@ describe('get currency', () => {
     { scheme: ES, input: GBP, expected: '' },
     { scheme: IMPS, input: GBP, expected: '' },
     { scheme: SFI, input: GBP, expected: GBP }
-  ])('returns $expected for $scheme scheme', ({ scheme, input, expected }) => {
+  ])('returns "$expected" for scheme $scheme', ({ scheme, input, expected }) => {
     expect(getCurrency(scheme, input)).toBe(expected)
   })
 })
