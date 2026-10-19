@@ -1,11 +1,4 @@
-const mockSendMessage = jest.fn()
-
-jest.mock('ffc-messaging', () => ({
-  MessageSender: jest.fn().mockImplementation(() => ({
-    sendMessage: mockSendMessage,
-    closeConnection: jest.fn()
-  }))
-}))
+jest.mock('../../../app/messaging/send-file-transfer-message', () => jest.fn())
 
 jest.mock('ffc-pay-event-publisher', () => ({
   PublishEvent: jest.fn().mockImplementation(() => ({
@@ -22,6 +15,7 @@ jest.mock('ffc-pay-event-publisher', () => ({
 
 const db = require('../../../app/data')
 const { AP } = require('../../../app/constants/ledgers')
+const sendFileTransferMessage = require('../../../app/messaging/send-file-transfer-message')
 const generateBatches = require('../../../app/batching/generate-batches')
 
 let scheme
@@ -92,9 +86,9 @@ describe('generate batches', () => {
   test('sends file-transfer message', async () => {
     await setup()
 
-    const sent = mockSendMessage.mock.calls[0][0].body
-
-    expect(sent.ledger).toBe(AP)
-    expect(sent.filename).toBeDefined()
+    expect(sendFileTransferMessage).toHaveBeenCalledTimes(1)
+    const [filename, batch] = sendFileTransferMessage.mock.calls[0]
+    expect(filename).toBeDefined()
+    expect(batch.ledger).toBe(AP)
   })
 })

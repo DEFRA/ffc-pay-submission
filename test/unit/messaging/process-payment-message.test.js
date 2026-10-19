@@ -1,4 +1,3 @@
-jest.mock('ffc-messaging')
 jest.mock('../../../app/data')
 
 jest.mock('../../../app/inbound', () => jest.fn())
