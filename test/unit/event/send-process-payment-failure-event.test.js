@@ -45,6 +45,23 @@ describe('sendProcessPaymentFailureEvent', () => {
     })
   })
 
+  test('publishes the error message when given an Error', async () => {
+    const data = { paymentId: 'PAY-123' }
+    const type = 'payment-processing-failed'
+    const error = new TypeError('invoiceLines is not iterable')
+
+    await sendProcessPaymentFailureEvent(data, type, error)
+
+    expect(mockPublishEvent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: {
+          message: 'invoiceLines is not iterable',
+          paymentId: 'PAY-123'
+        }
+      })
+    )
+  })
+
   test('publishes event with multiple data properties', async () => {
     const data = {
       paymentId: 'PAY-456',
