@@ -1,10 +1,12 @@
-const db = require('../data')
+const db = require('../database')
+const TABLES = require('../constants/tables')
+const { pickColumns } = require('../constants/columns')
 const getExistingPaymentRequest = require('./get-existing-payment-request')
 const saveInvoiceLines = require('./save-invoice-lines')
 const sendDuplicatePaymentEvent = require('../event/send-duplicate-payment-event')
 
 const savePaymentRequest = async (paymentRequest) => {
-  const transaction = await db.sequelize.transaction()
+  const transaction = await db.transaction()
   try {
     const existingPaymentRequest = await getExistingPaymentRequest(paymentRequest.invoiceNumber, paymentRequest.referenceId, transaction)
     if (existingPaymentRequest) {
@@ -12,8 +14,10 @@ const savePaymentRequest = async (paymentRequest) => {
       await sendDuplicatePaymentEvent(paymentRequest)
     } else {
       delete paymentRequest.paymentRequestId
-      const savedPaymentRequest = await db.paymentRequest.create(paymentRequest, { transaction })
-      await db.queue.create({ paymentRequestId: savedPaymentRequest.paymentRequestId }, { transaction })
+      const [savedPaymentRequest] = await db.paymentRequest(transaction)
+        .insert(pickColumns(paymentRequest, TABLES.paymentRequest))
+        .returning('paymentRequestId')
+      await db.queue(transaction).insert({ paymentRequestId: savedPaymentRequest.paymentRequestId })
       await saveInvoiceLines(paymentRequest.invoiceLines, savedPaymentRequest.paymentRequestId, transaction)
     }
     await transaction.commit()
