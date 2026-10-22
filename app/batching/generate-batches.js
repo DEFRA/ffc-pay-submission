@@ -1,4 +1,4 @@
-const db = require('../data')
+const db = require('../database')
 const getBatches = require('./get-batches')
 const getFileName = require('./get-filename')
 const getContent = require('./get-content')
@@ -10,7 +10,7 @@ const completeBatch = require('./complete-batch')
 
 const generateBatches = async () => {
   await allocateToBatches()
-  const transaction = await db.sequelize.transaction()
+  const transaction = await db.transaction()
   try {
     const batches = await getBatches(transaction)
     for (const batch of batches) {

@@ -1,4 +1,6 @@
-const db = require('../../../app/data')
+const moment = require('moment')
+const db = require('../../../app/database')
+const { truncate } = require('../../helpers/truncate')
 const getBatches = require('../../../app/batching/get-batches')
 const { AP } = require('../../../app/constants/ledgers')
 
@@ -9,13 +11,13 @@ let invoiceLine
 let batchProperties
 
 const runGetBatches = async () =>
-  db.sequelize.transaction(async (transaction) => {
+  db.transaction(async (transaction) => {
     return await getBatches(transaction)
   })
 
 describe('get batches', () => {
   beforeEach(async () => {
-    await db.sequelize.truncate({ cascade: true })
+    await truncate()
 
     scheme = { schemeId: 1, name: 'SFI' }
 
@@ -49,51 +51,113 @@ describe('get batches', () => {
   })
 
   afterAll(async () => {
-    await db.sequelize.truncate({ cascade: true })
-    await db.sequelize.close()
+    await truncate()
+    await db.close()
   })
 
   test('should not return batches if no payment requests', async () => {
-    await db.scheme.create(scheme)
-    await db.batchProperties.create(batchProperties)
-    await db.batch.create(batch)
+    await db.scheme().insert(scheme)
+    await db.batchProperties().insert(batchProperties)
+    await db.batch().insert(batch)
 
     const batches = await runGetBatches()
     expect(batches.length).toBe(0)
   })
 
   test('should not return batches if payment requests have no invoice lines', async () => {
-    await db.scheme.create(scheme)
-    await db.batchProperties.create(batchProperties)
-    await db.batch.create(batch)
-    await db.paymentRequest.create(paymentRequest)
+    await db.scheme().insert(scheme)
+    await db.batchProperties().insert(batchProperties)
+    await db.batch().insert(batch)
+    await db.paymentRequest().insert(paymentRequest)
 
     const batches = await runGetBatches()
     expect(batches.length).toBe(0)
   })
 
   test('should return batch if not complete', async () => {
-    await db.scheme.create(scheme)
-    await db.batchProperties.create(batchProperties)
-    await db.batch.create(batch)
-    await db.paymentRequest.create(paymentRequest)
-    await db.invoiceLine.create(invoiceLine)
+    await db.scheme().insert(scheme)
+    await db.batchProperties().insert(batchProperties)
+    await db.batch().insert(batch)
+    await db.paymentRequest().insert(paymentRequest)
+    await db.invoiceLine().insert(invoiceLine)
 
     const batches = await runGetBatches()
     expect(batches.length).toBe(1)
   })
 
   test('should update started', async () => {
-    await db.scheme.create(scheme)
-    await db.batchProperties.create(batchProperties)
-    await db.batch.create(batch)
-    await db.paymentRequest.create(paymentRequest)
-    await db.invoiceLine.create(invoiceLine)
+    await db.scheme().insert(scheme)
+    await db.batchProperties().insert(batchProperties)
+    await db.batch().insert(batch)
+    await db.paymentRequest().insert(paymentRequest)
+    await db.invoiceLine().insert(invoiceLine)
 
     await runGetBatches()
 
-    const batchResult = await db.batch.findByPk(batch.batchId)
+    const batchResult = await db.batch().where({ batchId: batch.batchId }).first()
     expect(batchResult.started).not.toBeNull()
+  })
+
+  test('should not return batch if already published', async () => {
+    batch.published = new Date()
+    await db.scheme().insert(scheme)
+    await db.batchProperties().insert(batchProperties)
+    await db.batch().insert(batch)
+    await db.paymentRequest().insert(paymentRequest)
+    await db.invoiceLine().insert(invoiceLine)
+
+    const batches = await runGetBatches()
+    expect(batches.length).toBe(0)
+  })
+
+  test('should not return batch started within the processing delay', async () => {
+    batch.started = moment().subtract(4, 'minutes').toDate()
+    await db.scheme().insert(scheme)
+    await db.batchProperties().insert(batchProperties)
+    await db.batch().insert(batch)
+    await db.paymentRequest().insert(paymentRequest)
+    await db.invoiceLine().insert(invoiceLine)
+
+    const batches = await runGetBatches()
+    expect(batches.length).toBe(0)
+  })
+
+  test('should return batch started before the processing delay', async () => {
+    batch.started = moment().subtract(6, 'minutes').toDate()
+    await db.scheme().insert(scheme)
+    await db.batchProperties().insert(batchProperties)
+    await db.batch().insert(batch)
+    await db.paymentRequest().insert(paymentRequest)
+    await db.invoiceLine().insert(invoiceLine)
+
+    const batches = await runGetBatches()
+    expect(batches.length).toBe(1)
+  })
+
+  test('should return batch with payment requests, invoice lines and scheme batch properties', async () => {
+    await db.scheme().insert(scheme)
+    await db.batchProperties().insert(batchProperties)
+    await db.batch().insert(batch)
+    await db.paymentRequest().insert(paymentRequest)
+    await db.invoiceLine().insert(invoiceLine)
+
+    const [result] = await runGetBatches()
+    expect(result.batchId).toBe(batch.batchId)
+    expect(result.paymentRequests).toHaveLength(1)
+    expect(result.paymentRequests[0].invoiceLines).toHaveLength(1)
+    expect(result.paymentRequests[0].invoiceLines[0].invoiceLineId).toBe(invoiceLine.invoiceLineId)
+    expect(result.scheme.schemeId).toBe(scheme.schemeId)
+    expect(result.scheme.batchProperties.prefix).toBe(batchProperties.prefix)
+  })
+
+  test('should not return batch if scheme has no batch properties', async () => {
+    await db.scheme().insert(scheme)
+    await db.batch().insert(batch)
+    await db.paymentRequest().insert(paymentRequest)
+    await db.invoiceLine().insert(invoiceLine)
+
+    const batches = await runGetBatches()
+    expect(batches.length).toBe(0)
   })
 
   test('should throw if called without a transaction', async () => {
@@ -104,11 +168,8 @@ describe('get batches', () => {
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
 
     const fakeTransaction = {
-      LOCK: { UPDATE: 'UPDATE' }
+      raw: jest.fn(() => { throw new Error('boom') })
     }
-
-    const originalQuery = db.sequelize.query
-    db.sequelize.query = jest.fn(() => { throw new Error('boom') })
 
     await expect(getBatches(fakeTransaction)).rejects.toThrow('boom')
 
@@ -117,22 +178,20 @@ describe('get batches', () => {
       expect.any(Error)
     )
 
-    db.sequelize.query = originalQuery
     consoleSpy.mockRestore()
   })
 
   test('should rethrow errors from inner functions', async () => {
-    await db.scheme.create(scheme)
-    await db.batchProperties.create(batchProperties)
-    await db.batch.create(batch)
-    await db.paymentRequest.create(paymentRequest)
-    await db.invoiceLine.create(invoiceLine)
+    await db.scheme().insert(scheme)
+    await db.batchProperties().insert(batchProperties)
+    await db.batch().insert(batch)
+    await db.paymentRequest().insert(paymentRequest)
+    await db.invoiceLine().insert(invoiceLine)
 
-    const original = db.sequelize.query
-    db.sequelize.query = jest.fn(() => { throw new Error('forced failure') })
+    const batchSpy = jest.spyOn(db, 'batch').mockImplementation(() => { throw new Error('forced failure') })
 
     await expect(runGetBatches()).rejects.toThrow('forced failure')
 
-    db.sequelize.query = original
+    batchSpy.mockRestore()
   })
 })
