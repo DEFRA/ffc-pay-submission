@@ -7,7 +7,7 @@ const sendProcessPaymentFailureEvent = async (data, type, error) => {
     type,
     subject: 'Process Payment Failure',
     data: {
-      message: error,
+      message: error?.message ?? error,
       ...data
     }
   }
