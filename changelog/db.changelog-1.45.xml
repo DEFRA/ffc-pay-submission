@@ -1,0 +1,82 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-3.9.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.9.xsd">
+  <changeSet author="Sam Plackett" id="1">
+    <tagDatabase tag="v1.45.0" />
+  </changeSet>
+
+  <changeSet author="Sam Plackett" id="2">
+    <comment>Remove FFC from all prefixes to enable "FRPS" modifier for V2 journals</comment>
+    <update tableName="batchProperties">
+      <column name="prefix" value="SFI" />
+      <where>"schemeId" = 1</where>
+    </update>
+    <update tableName="batchProperties">
+      <column name="prefix" value="SFIP" />
+      <where>"schemeId" = 2</where>
+    </update>
+    <update tableName="batchProperties">
+      <column name="prefix" value="LS" />
+      <where>"schemeId" = 3</where>
+    </update>
+    <update tableName="batchProperties">
+      <column name="prefix" value="VV" />
+      <where>"schemeId" = 4</where>
+    </update>
+    <update tableName="batchProperties">
+      <column name="prefix" value="CS" />
+      <where>"schemeId" = 5</where>
+    </update>
+    <update tableName="batchProperties">
+      <column name="prefix" value="BPS" />
+      <where>"schemeId" = 6</where>
+    </update>
+    <update tableName="batchProperties">
+      <column name="prefix" value="Manual" />
+      <where>"schemeId" = 8</where>
+    </update>
+    <update tableName="batchProperties">
+      <column name="prefix" value="ES" />
+      <where>"schemeId" = 9</where>
+    </update>
+    <update tableName="batchProperties">
+      <column name="prefix" value="FC" />
+      <where>"schemeId" = 10</where>
+    </update>
+    <update tableName="batchProperties">
+      <column name="prefix" value="IMPS" />
+      <where>"schemeId" = 11</where>
+    </update>
+    <update tableName="batchProperties">
+      <column name="prefix" value="SFIA" />
+      <where>"schemeId" = 12</where>
+    </update>
+    <update tableName="batchProperties">
+      <column name="prefix" value="DP" />
+      <where>"schemeId" = 13</where>
+    </update>
+    <update tableName="batchProperties">
+      <column name="prefix" value="ESFIO" />
+      <where>"schemeId" = 14</where>
+    </update>
+    <update tableName="batchProperties">
+      <column name="prefix" value="SITICOHTR" />
+      <where>"schemeId" = 15</where>
+    </update>
+    <update tableName="batchProperties">
+      <column name="prefix" value="SITICOHTC" />
+      <where>"schemeId" = 16</where>
+    </update>
+    <update tableName="batchProperties">
+      <column name="prefix" value="FALS_FPTT" />
+      <where>"schemeId" = 17</where>
+    </update>
+    <update tableName="batchProperties">
+      <column name="prefix" value="FALS_WMP" />
+      <where>"schemeId" = 18</where>
+    </update>
+    <update tableName="batchProperties">
+      <column name="prefix" value="SITISFI26" />
+      <where>"schemeId" = 19</where>
+    </update>
+  </changeSet>
+</databaseChangeLog>
