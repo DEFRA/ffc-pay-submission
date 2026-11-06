@@ -3,8 +3,9 @@ const db = require('../../../app/database')
 const { truncate } = require('../../helpers/truncate')
 const getFilename = require('../../../app/batching/get-filename')
 const { AP, AR } = require('../../../app/constants/ledgers')
+const config = require('../../../app/config')
 
-const { MANUAL } = getSchemeIds()
+const { MANUAL, FPTT } = getSchemeIds()
 const { SFI } = getPillars()
 
 let batch
@@ -19,6 +20,7 @@ describe('get filename', () => {
       sequence: 1,
       started: new Date(2022, 2, 1, 22, 27, 0, 0),
       scheme: {
+        schemeId: null,
         batchProperties: {
           prefix: 'PFELM',
           suffix: ' (SITI)'
@@ -26,6 +28,7 @@ describe('get filename', () => {
       }
     }
     pillar = undefined
+    config.useV2FRPSJournals = false
   })
 
   afterAll(async () => {
@@ -35,19 +38,19 @@ describe('get filename', () => {
 
   test('should return filename for sequence 1', async () => {
     const filename = getFilename(batch, pillar)
-    expect(filename).toMatch(/PFELM_0001_AP_\d{14} \(SITI\).csv/)
+    expect(filename).toMatch(/FFCPFELM_0001_AP_\d{14} \(SITI\).csv/)
   })
 
   test('should return filename for sequence 10', async () => {
     batch.sequence = 10
     const filename = getFilename(batch, pillar)
-    expect(filename).toMatch(/PFELM_0010_AP_\d{14} \(SITI\).csv/)
+    expect(filename).toMatch(/FFCPFELM_0010_AP_\d{14} \(SITI\).csv/)
   })
 
   test('should return filename for AR ledger', async () => {
     batch.ledger = AR
     const filename = getFilename(batch, pillar)
-    expect(filename).toMatch(/PFELM_0001_AR_\d{14} \(SITI\).csv/)
+    expect(filename).toMatch(/FFCPFELM_0001_AR_\d{14} \(SITI\).csv/)
   })
 
   const fallbackVariants = [undefined, null, '', 'Something']
@@ -56,7 +59,7 @@ describe('get filename', () => {
       pillar = value
       batch.scheme.schemeId = MANUAL
       const filename = getFilename(batch, pillar)
-      expect(filename).toMatch(/PFELM_0001_AP_\d{14} \(SITI\).csv/)
+      expect(filename).toMatch(/FFCPFELM_0001_AP_\d{14} \(SITI\).csv/)
     })
   })
 
@@ -71,5 +74,21 @@ describe('get filename', () => {
     const fesCode = 'FESC'
     const filename = getFilename(batch, pillar, fesCode)
     expect(filename).toMatch(/FFCFESC_0001_AP_\d{14} \(FESC\).csv/)
+  })
+
+  test('should prepend FRPS to leading characters when V2 journals are enabled for FRPS schemes', async () => {
+    batch.scheme.schemeId = FPTT
+    config.useV2FRPSJournals = true
+
+    const filename = getFilename(batch, pillar)
+    expect(filename).toMatch(/FFCFRPSPFELM_0001_AP_\d{14} \(SITI\)\.csv/)
+  })
+
+  test('should include FRPS leading characters when fesCode is provided for V2 FRPS journals', async () => {
+    batch.scheme.schemeId = FPTT
+    config.useV2FRPSJournals = true
+
+    const filename = getFilename(batch, pillar, 'FESC')
+    expect(filename).toMatch(/FFCFRPSFESC_0001_AP_\d{14} \(FESC\).csv/)
   })
 })
