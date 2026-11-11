@@ -37,7 +37,7 @@ services:
       USE_V2_FRPS_JOURNALS: ${USE_V2_FRPS_JOURNALS:-true}
   
   ffc-pay-submission-postgres:
-    image: postgres:11.4-alpine
+    image: postgres:16.5-alpine
     environment:
       POSTGRES_DB: ffc_pay_submission
       POSTGRES_PASSWORD: ppp
